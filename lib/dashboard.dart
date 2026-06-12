@@ -624,9 +624,9 @@ class _Dashboard2State extends State<Dashboard2> {
                   } else if (nameLower.contains('iprice')) {
                     scale = 3.2; 
                   } else if (nameLower.contains('maybank')) {
-                    scale = 2.0; // Descaled a bit from 2.4 to 2.0
+                    scale = 2.0; // Descaled from 3.5 to 2.0
                   } else if (nameLower.contains('honeywell')) {
-                    scale = 0.03; // Descaled a bit from 0.05 to 0.03
+                    scale = 0.04; // Descaled from 0.05 to 0.04
                   } else if (needsZoom) {
                     scale = 1.1;
                   }
@@ -815,9 +815,9 @@ class _Dashboard2State extends State<Dashboard2> {
     } else if (nameLower.contains('iprice')) {
       scale = 2.5; 
     } else if (nameLower.contains('maybank')) {
-      scale = 2.0; // Descaled a bit from 2.4 to 2.0
+      scale = 2.0; // Descaled from 3.5 to 2.0
     } else if (nameLower.contains('honeywell')) {
-      scale = 0.03; // Descaled a bit from 0.05 to 0.03
+      scale = 0.04; // Descaled from 0.05 to 0.04
     } else if (needsZoom) {
       scale = 1.1;
     }

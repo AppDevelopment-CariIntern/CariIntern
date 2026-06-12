@@ -307,9 +307,9 @@ class _SearchPageState extends State<SearchPage> {
                   } else if (nameLower.contains('kpmg')) {
                     scale = 1.4; // Upscaled a bit
                   } else if (nameLower.contains('maybank')) {
-                    scale = 4.0; // Upscaled more
+                    scale = 1.8; // Descaled a bit from 4.0
                   } else if (nameLower.contains('honeywell')) {
-                    scale = 0.2; // Descaled significantly
+                    scale = 0.05; // Descaled a bit from 0.2
                   }
                   
                   return scale != 1.0 ? Transform.scale(scale: scale, child: image) : image;
