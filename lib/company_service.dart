@@ -314,7 +314,7 @@ class CompanyService {
       'description': 'Microsoft’s mission is to empower every person and every organization on the planet to achieve more. In Malaysia, Microsoft is a key driver of the digital economy, providing cloud services, software, and hardware that enable transformation across all sectors. It is a place where you can build the future of AI and cloud computing.',
       'rating': '4.8',
       'imagePath': 'asset/image/Windows.png',
-      'bannerPath': 'asset/image/company/microsoft company.avif',
+      'bannerPath': 'asset/image/company/microsoft company.jpg',
       'allowance': 'RM1,500 - RM2,500',
       'reviews': [
         {'user': 'Tariq Z.', 'rating': 4.9, 'comment': 'Cloud and AI at its best. Great learning path.', 'isSample': true},
