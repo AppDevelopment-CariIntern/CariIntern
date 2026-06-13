@@ -64,21 +64,61 @@ class _MyAppState extends State<MyApp> {
           title: 'CariIntern',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
+            useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.deepPurple,
               primary: Colors.deepPurple,
               brightness: Brightness.light,
+              surface: const Color(0xFFF8F7FF),
+              onSurface: const Color(0xFF311B92),
             ),
-            useMaterial3: true,
             scaffoldBackgroundColor: const Color(0xFFF8F7FF),
+            textTheme: const TextTheme(
+              titleLarge: TextStyle(color: Color(0xFF311B92), fontWeight: FontWeight.bold),
+              bodyLarge: TextStyle(color: Color(0xFF311B92)),
+              bodyMedium: TextStyle(color: Color(0xFF311B92)),
+            ),
           ),
           darkTheme: ThemeData(
+            useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.deepPurple,
-              primary: Colors.deepPurple,
+              primary: Colors.deepPurpleAccent,
               brightness: Brightness.dark,
+              surface: const Color(0xFF1E1E1E), // Darker surface for cards/containers
+              onSurface: Colors.white, // Light font color
+              onSurfaceVariant: Colors.white70,
             ),
-            useMaterial3: true,
+            scaffoldBackgroundColor: const Color(0xFF121212), // Deep dark background
+            textTheme: const TextTheme(
+              displayLarge: TextStyle(color: Colors.white),
+              displayMedium: TextStyle(color: Colors.white),
+              displaySmall: TextStyle(color: Colors.white),
+              headlineLarge: TextStyle(color: Colors.white),
+              headlineMedium: TextStyle(color: Colors.white),
+              headlineSmall: TextStyle(color: Colors.white),
+              titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              titleMedium: TextStyle(color: Colors.white),
+              titleSmall: TextStyle(color: Colors.white),
+              bodyLarge: TextStyle(color: Colors.white),
+              bodyMedium: TextStyle(color: Colors.white70),
+              bodySmall: TextStyle(color: Colors.white60),
+              labelLarge: TextStyle(color: Colors.white),
+              labelMedium: TextStyle(color: Colors.white),
+              labelSmall: TextStyle(color: Colors.white),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              iconTheme: IconThemeData(color: Colors.white),
+              titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            cardTheme: CardThemeData(
+              color: const Color(0xFF1E1E1E),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            iconTheme: const IconThemeData(color: Colors.white),
           ),
           themeMode: currentMode,
           home: StreamBuilder<User?>(

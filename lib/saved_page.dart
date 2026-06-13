@@ -15,18 +15,29 @@ class _SavedPageState extends State<SavedPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (_user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please log in to see saved internships.')),
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Text(
+            'Please log in to see saved internships.',
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 16),
+          ),
+        ),
       );
     }
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8F7FF), Color(0xFFEEEBFF)],
+          colors: isDark 
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)]
+            : [const Color(0xFFF8F7FF), const Color(0xFFEEEBFF)],
         ),
       ),
       child: Scaffold(
@@ -38,12 +49,12 @@ class _SavedPageState extends State<SavedPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Saved',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF311B92),
+                    color: isDark ? Colors.white : const Color(0xFF311B92),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -67,22 +78,26 @@ class _SavedPageState extends State<SavedPage> {
                               Container(
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.deepPurple.withValues(alpha: 0.1),
+                                      color: theme.colorScheme.primary.withAlpha(isDark ? 0 : 25),
                                       blurRadius: 20,
                                       offset: const Offset(0, 10),
                                     ),
                                   ],
                                 ),
-                                child: const Icon(Icons.bookmark_outline_rounded, size: 64, color: Colors.deepPurple),
+                                child: Icon(Icons.bookmark_outline_rounded, size: 64, color: theme.colorScheme.primary),
                               ),
                               const SizedBox(height: 24),
-                              const Text(
+                              Text(
                                 'No saved internships yet.',
-                                style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 18, 
+                                  color: isDark ? Colors.white70 : Colors.grey, 
+                                  fontWeight: FontWeight.bold
+                                ),
                               ),
                             ],
                           ),
@@ -110,12 +125,14 @@ class _SavedPageState extends State<SavedPage> {
   }
 
   Widget _buildSavedItem(Map<String, dynamic> company) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final String name = company['name'].toString();
     final String? imagePath = company['imagePath']?.toString().trim();
     final String? bannerPath = company['bannerPath']?.toString().trim();
     final String nameLower = name.toLowerCase();
     
-    // Check if it's one of the target logos
     final bool isTargetLogo = nameLower.contains('bosch') || 
                               nameLower.contains('cimb') || 
                               nameLower.contains('deloitte') || 
@@ -125,7 +142,6 @@ class _SavedPageState extends State<SavedPage> {
                               nameLower.contains('maybank') ||
                               nameLower.contains('honeywell');
     
-    // Existing logic for Petronas
     final bool isPetronas = nameLower.contains('petronas');
 
     return GestureDetector(
@@ -151,11 +167,11 @@ class _SavedPageState extends State<SavedPage> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.deepPurple.withValues(alpha: 0.05),
+              color: Colors.black.withAlpha(isDark ? 0 : 13),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -168,14 +184,14 @@ class _SavedPageState extends State<SavedPage> {
               width: 56, 
               padding: EdgeInsets.all(isTargetLogo || isPetronas ? 0 : 4),
               decoration: BoxDecoration(
-                color: (name == 'Maybank') ? const Color(0xFFFFD100) : const Color(0xFFF5F7FA),
+                color: (name == 'Maybank') ? const Color(0xFFFFD100) : (isDark ? Colors.grey[800] : const Color(0xFFF5F7FA)),
                 borderRadius: BorderRadius.circular(14),
               ),
               clipBehavior: Clip.antiAlias,
               child: Builder(
                 builder: (context) {
                   if (imagePath == null || imagePath.isEmpty) {
-                    return const Center(child: Icon(Icons.business, size: 28, color: Colors.deepPurple));
+                    return Center(child: Icon(Icons.business, size: 28, color: theme.colorScheme.primary));
                   }
 
                   Widget image = imagePath.startsWith('http')
@@ -185,7 +201,7 @@ class _SavedPageState extends State<SavedPage> {
                           height: 56,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.business, size: 28, color: Colors.deepPurple),
+                              Center(child: Icon(Icons.business, size: 28, color: theme.colorScheme.primary)),
                         )
                       : Image.asset(
                           imagePath,
@@ -193,7 +209,7 @@ class _SavedPageState extends State<SavedPage> {
                           height: 56,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.business, size: 28, color: Colors.deepPurple),
+                              Center(child: Icon(Icons.business, size: 28, color: theme.colorScheme.primary)),
                         );
 
                   double scale = 1.0;
@@ -208,9 +224,9 @@ class _SavedPageState extends State<SavedPage> {
                   } else if (nameLower.contains('kpmg')) {
                     scale = 1.4; 
                   } else if (nameLower.contains('maybank')) {
-                    scale = 4.5; // Upscaled further
+                    scale = 2.0;
                   } else if (nameLower.contains('honeywell')) {
-                    scale = 0.2; // Descaled further
+                    scale = 0.05;
                   }
                   
                   return scale != 1.0 ? Transform.scale(scale: scale, child: image) : image;
@@ -224,17 +240,21 @@ class _SavedPageState extends State<SavedPage> {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Color(0xFF311B92)),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 17, 
+                      color: isDark ? Colors.white : const Color(0xFF311B92)
+                    ),
                   ),
                   Text(
                     company['industry'].toString(),
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    style: TextStyle(color: isDark ? Colors.white60 : Colors.grey, fontSize: 14),
                   ),
                 ],
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.bookmark_rounded, color: Colors.deepPurple),
+              icon: Icon(Icons.bookmark_rounded, color: theme.colorScheme.primary),
               onPressed: () {
                 _unsaveCompany(name);
               },

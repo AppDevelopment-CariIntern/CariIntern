@@ -7,6 +7,7 @@ class ApplicationsPage extends StatelessWidget {
   const ApplicationsPage({super.key});
 
   Future<void> _deleteApplication(BuildContext context, String docId) async {
+    final theme = Theme.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -51,14 +52,16 @@ class ApplicationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     if (user == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
           child: Text(
             'Please log in to view your applications.',
-            style: TextStyle(color: Colors.grey, fontSize: 16),
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 16),
           ),
         ),
       );
@@ -69,10 +72,10 @@ class ApplicationsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'My Applications',
           style: TextStyle(
-            color: Color(0xFF311B92),
+            color: isDark ? Colors.white : const Color(0xFF311B92),
             fontWeight: FontWeight.bold,
             fontSize: 24,
           ),
@@ -85,7 +88,7 @@ class ApplicationsPage extends StatelessWidget {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: theme.colorScheme.error)));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -93,7 +96,7 @@ class ApplicationsPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return _buildEmptyState(user.email);
+            return _buildEmptyState(context, user.email);
           }
 
           final docs = snapshot.data!.docs.toList();
@@ -123,26 +126,37 @@ class ApplicationsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(String? email) {
+  Widget _buildEmptyState(BuildContext context, String? email) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.assignment_outlined, size: 80, color: Colors.deepPurple.withValues(alpha: 0.2)),
+          Icon(
+            Icons.assignment_outlined, 
+            size: 80, 
+            color: theme.colorScheme.primary.withAlpha(isDark ? 50 : 25)
+          ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No applications yet',
-            style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18, 
+              color: isDark ? Colors.white70 : Colors.grey, 
+              fontWeight: FontWeight.bold
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'Logged in as: $email',
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
+            style: TextStyle(color: isDark ? Colors.white54 : Colors.grey, fontSize: 12),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Your applied internships will appear here.',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: isDark ? Colors.white54 : Colors.grey),
           ),
         ],
       ),
@@ -150,6 +164,9 @@ class ApplicationsPage extends StatelessWidget {
   }
 
   Widget _buildApplicationCard(BuildContext context, Map<String, dynamic> app, String docId) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final String company = app['companyName'] ?? 'Unknown Company';
     final String position = app['position'] ?? 'Unknown Position';
     final String status = app['status'] ?? 'Pending';
@@ -183,11 +200,11 @@ class ApplicationsPage extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.deepPurple.withValues(alpha: 0.05),
+            color: Colors.black.withAlpha(isDark ? 0 : 13),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -199,10 +216,10 @@ class ApplicationsPage extends StatelessWidget {
             height: 60,
             width: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F7FA),
+              color: isDark ? Colors.grey[800] : const Color(0xFFF5F7FA),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Icons.business, color: Colors.deepPurple, size: 30),
+            child: Icon(Icons.business, color: theme.colorScheme.primary, size: 30),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -211,11 +228,15 @@ class ApplicationsPage extends StatelessWidget {
               children: [
                 Text(
                   position,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF311B92)),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16, 
+                    color: isDark ? Colors.white : const Color(0xFF311B92)
+                  ),
                 ),
                 Text(
                   company,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -232,7 +253,7 @@ class ApplicationsPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
+                  color: statusColor.withAlpha(25),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(

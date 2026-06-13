@@ -78,13 +78,16 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F7FF),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.deepPurple),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -94,18 +97,18 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Welcome Back!',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF311B92),
+                color: isDark ? Colors.white : const Color(0xFF311B92),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               "Log in to continue your journey.",
-              style: TextStyle(fontSize: 16, color: Colors.black54),
+              style: TextStyle(fontSize: 16, color: isDark ? Colors.white70 : Colors.black54),
             ),
             const SizedBox(height: 48),
             _buildTextField(
@@ -129,10 +132,10 @@ class _LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _handleLogin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: theme.colorScheme.primary,
                   foregroundColor: Colors.white,
                   elevation: 4,
-                  shadowColor: Colors.deepPurple.withValues(alpha: 0.4),
+                  shadowColor: theme.colorScheme.primary.withAlpha(100),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: _isLoading 
@@ -150,13 +153,13 @@ class _LoginPageState extends State<LoginPage> {
                   );
                 },
                 child: RichText(
-                  text: const TextSpan(
+                  text: TextSpan(
                     text: "Don't have an account? ",
-                    style: TextStyle(color: Colors.black54, fontSize: 15),
+                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 15),
                     children: [
                       TextSpan(
                         text: 'Sign Up',
-                        style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -176,18 +179,28 @@ class _LoginPageState extends State<LoginPage> {
     TextEditingController? controller,
     IconData? icon,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF311B92))),
+        Text(
+          label, 
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            fontSize: 14, 
+            color: isDark ? Colors.white : const Color(0xFF311B92)
+          )
+        ),
         const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.deepPurple.withValues(alpha: 0.05),
+                color: Colors.black.withAlpha(isDark ? 0 : 13),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -196,10 +209,11 @@ class _LoginPageState extends State<LoginPage> {
           child: TextField(
             controller: controller,
             obscureText: isPassword,
+            style: TextStyle(color: theme.colorScheme.onSurface),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.grey.shade400),
-              prefixIcon: icon != null ? Icon(icon, color: Colors.deepPurple, size: 22) : null,
+              hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120)),
+              prefixIcon: icon != null ? Icon(icon, color: theme.colorScheme.primary, size: 22) : null,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             ),

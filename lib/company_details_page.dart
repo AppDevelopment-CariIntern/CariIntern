@@ -225,8 +225,9 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                 );
           
           double scale = 1.0;
-          if (nameLower.contains('bosch')) scale = 1.5;
-          else if (nameLower.contains('cimb')) scale = 1.2;
+          if (nameLower.contains('bosch')) {
+            scale = 1.5;
+          } else if (nameLower.contains('cimb')) scale = 1.2;
           else if (nameLower.contains('grab')) scale = 1.4;
           else if (nameLower.contains('deloitte') || nameLower.contains('ey')) scale = 1.3;
           else if (nameLower.contains('kpmg')) scale = 1.4; 
@@ -241,15 +242,18 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F7FF),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
             expandedHeight: 220,
             pinned: true,
-            backgroundColor: Colors.deepPurple,
+            backgroundColor: theme.colorScheme.primary,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
@@ -271,9 +275,11 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                       fit: BoxFit.cover,
                     )
                   : Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.deepPurple, Color(0xFF7C4DFF)],
+                          colors: isDark 
+                              ? [theme.colorScheme.surface, theme.colorScheme.primary.withAlpha(100)]
+                              : [Colors.deepPurple, const Color(0xFF7C4DFF)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -284,9 +290,9 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
           ),
           SliverToBoxAdapter(
             child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFF8F7FF),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
                 ),
@@ -305,12 +311,20 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                             children: [
                               Text(
                                 widget.name,
-                                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF311B92)),
+                                style: TextStyle(
+                                  fontSize: 28, 
+                                  fontWeight: FontWeight.bold, 
+                                  color: isDark ? Colors.white : const Color(0xFF311B92)
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 widget.industry,
-                                style: const TextStyle(fontSize: 16, color: Colors.deepPurple, fontWeight: FontWeight.w500),
+                                style: TextStyle(
+                                  fontSize: 16, 
+                                  color: theme.colorScheme.primary, 
+                                  fontWeight: FontWeight.w500
+                                ),
                               ),
                             ],
                           ),
@@ -318,21 +332,35 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFF9C4),
+                            color: isDark ? Colors.amber.withAlpha(50) : const Color(0xFFFFF9C4),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
                             children: [
                               const Icon(Icons.star_rounded, color: Colors.amber, size: 24),
                               const SizedBox(width: 4),
-                              Text(widget.rating, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFFF57F17))),
+                              Text(
+                                widget.rating, 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, 
+                                  fontSize: 18, 
+                                  color: isDark ? Colors.amber : const Color(0xFFF57F17)
+                                )
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 32),
-                    const Text('Available Positions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+                    Text(
+                      'Available Positions', 
+                      style: TextStyle(
+                        fontSize: 20, 
+                        fontWeight: FontWeight.bold, 
+                        color: isDark ? Colors.white : const Color(0xFF311B92)
+                      )
+                    ),
                     const SizedBox(height: 16),
                     Wrap(
                       spacing: 10,
@@ -344,12 +372,25 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                             decoration: BoxDecoration(
-                              color: isSelected ? Colors.deepPurple : Colors.white,
+                              color: isSelected ? theme.colorScheme.primary : (isDark ? const Color(0xFF2C2C2C) : Colors.white),
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: isSelected ? Colors.deepPurple : Colors.transparent),
-                              boxShadow: [if (!isSelected) BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
+                              border: Border.all(color: isSelected ? theme.colorScheme.primary : Colors.transparent),
+                              boxShadow: [
+                                if (!isSelected) 
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(isDark ? 50 : 12), 
+                                    blurRadius: 8, 
+                                    offset: const Offset(0, 2)
+                                  )
+                              ],
                             ),
-                            child: Text(pos, style: TextStyle(color: isSelected ? Colors.white : Colors.deepPurple, fontWeight: FontWeight.w600)),
+                            child: Text(
+                              pos, 
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.deepPurple), 
+                                fontWeight: FontWeight.w600
+                              )
+                            ),
                           ),
                         );
                       }).toList(),
@@ -357,7 +398,14 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                     const SizedBox(height: 32),
                     _sectionCard('About Company', widget.description ?? 'A leading company in the industry.'),
                     const SizedBox(height: 32),
-                    const Text('Internship Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+                    Text(
+                      'Internship Details', 
+                      style: TextStyle(
+                        fontSize: 20, 
+                        fontWeight: FontWeight.bold, 
+                        color: isDark ? Colors.white : const Color(0xFF311B92)
+                      )
+                    ),
                     const SizedBox(height: 16),
                     _buildDetailItem(Icons.work_outline_rounded, 'Position', _selectedPosition),
                     _buildDetailItem(Icons.location_on_outlined, 'Location', widget.location ?? 'Kuala Lumpur, Malaysia'),
@@ -365,7 +413,6 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                     _buildDetailItem(Icons.calendar_today_outlined, 'Duration', '3 - 6 Months'),
                     
                     const SizedBox(height: 40),
-                    SliverToBoxAdapter(child: const SizedBox.shrink()), // placeholder
                     SizedBox(
                       width: double.infinity,
                       height: 60,
@@ -383,7 +430,7 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
+                          backgroundColor: theme.colorScheme.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                         ),
@@ -392,19 +439,26 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                     ),
 
                     const SizedBox(height: 40),
-                    const Text('User Reviews', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+                    Text(
+                      'User Reviews', 
+                      style: TextStyle(
+                        fontSize: 20, 
+                        fontWeight: FontWeight.bold, 
+                        color: isDark ? Colors.white : const Color(0xFF311B92)
+                      )
+                    ),
                     const SizedBox(height: 16),
                     
                     StreamBuilder<DocumentSnapshot>(
                       stream: FirebaseFirestore.instance.collection('companies').doc(widget.name).snapshots(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) return const CircularProgressIndicator();
-                        if (!snapshot.hasData || !snapshot.data!.exists) return const Text('No reviews yet.');
+                        if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                        if (!snapshot.hasData || !snapshot.data!.exists) return Text('No reviews yet.', style: TextStyle(color: theme.colorScheme.onSurfaceVariant));
                         
                         final data = snapshot.data!.data() as Map<String, dynamic>;
                         final reviews = (data['reviews'] as List?)?.reversed.toList() ?? [];
                         
-                        if (reviews.isEmpty) return const Text('No reviews yet. Be the first to share your experience!');
+                        if (reviews.isEmpty) return Text('No reviews yet. Be the first to share your experience!', style: TextStyle(color: theme.colorScheme.onSurfaceVariant));
 
                         return ListView.builder(
                           shrinkWrap: true,
@@ -425,26 +479,45 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                     ),
 
                     const SizedBox(height: 24),
-                    const Text('Write a Review', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+                    Text(
+                      'Write a Review', 
+                      style: TextStyle(
+                        fontSize: 18, 
+                        fontWeight: FontWeight.bold, 
+                        color: isDark ? Colors.white : const Color(0xFF311B92)
+                      )
+                    ),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(isDark ? 0 : 10), 
+                            blurRadius: 10, 
+                            offset: const Offset(0, 4)
+                          )
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              const Text('Rating: ', style: TextStyle(fontWeight: FontWeight.w600)),
+                              Text(
+                                'Rating: ', 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600, 
+                                  color: theme.colorScheme.onSurface
+                                )
+                              ),
                               ...List.generate(5, (index) => GestureDetector(
                                 onTap: () => setState(() => _userRating = index + 1.0),
                                 child: Icon(
                                   Icons.star_rounded,
-                                  color: index < _userRating ? Colors.amber : Colors.grey[300],
+                                  color: index < _userRating ? Colors.amber : Colors.grey[400],
                                   size: 28,
                                 ),
                               )),
@@ -454,11 +527,13 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                           TextField(
                             controller: _reviewController,
                             maxLines: 3,
+                            style: TextStyle(color: theme.colorScheme.onSurface),
                             decoration: InputDecoration(
                               hintText: 'Share your internship experience...',
+                              hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120)),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                               filled: true,
-                              fillColor: const Color(0xFFF5F7FA),
+                              fillColor: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -467,7 +542,7 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                             child: ElevatedButton(
                               onPressed: _submitReview,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple,
+                                backgroundColor: theme.colorScheme.primary,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
@@ -488,26 +563,53 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
   }
 
   Widget _sectionCard(String title, String content) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 0 : 10), 
+            blurRadius: 10, 
+            offset: const Offset(0, 4)
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+          Text(
+            title, 
+            style: TextStyle(
+              fontSize: 18, 
+              fontWeight: FontWeight.bold, 
+              color: isDark ? Colors.white : const Color(0xFF311B92)
+            )
+          ),
           const SizedBox(height: 12),
-          Text(content, style: const TextStyle(fontSize: 15, color: Colors.black87, height: 1.6), textAlign: TextAlign.justify),
+          Text(
+            content, 
+            style: TextStyle(
+              fontSize: 15, 
+              color: isDark ? Colors.white70 : Colors.black87, 
+              height: 1.6
+            ), 
+            textAlign: TextAlign.justify
+          ),
         ],
       ),
     );
   }
 
   Widget _buildReviewItem(String user, double rating, String comment, {bool isVerified = false, bool isSample = false}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     Color badgeColor = Colors.grey;
     String badgeText = "Unverified";
     IconData badgeIcon = Icons.info_outline;
@@ -526,9 +628,15 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 0 : 5), 
+            blurRadius: 8, 
+            offset: const Offset(0, 2)
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -540,8 +648,12 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                 child: Row(
                   children: [
                     Flexible(
-                      child: Text(user, 
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF311B92)),
+                      child: Text(
+                        user, 
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          color: isDark ? Colors.white : const Color(0xFF311B92)
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -549,7 +661,7 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: badgeColor.withValues(alpha: 0.1),
+                        color: badgeColor.withAlpha(25),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Row(
@@ -567,42 +679,81 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
               Row(
                 children: [
                   const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
-                  Text(' $rating', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(
+                    ' $rating', 
+                    style: TextStyle(
+                      fontSize: 12, 
+                      fontWeight: FontWeight.bold, 
+                      color: theme.colorScheme.onSurface
+                    )
+                  ),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(comment, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+          Text(
+            comment, 
+            style: TextStyle(
+              fontSize: 14, 
+              color: isDark ? Colors.white70 : Colors.black87
+            )
+          ),
         ],
       ),
     );
   }
 
   Widget _buildDetailItem(IconData icon, String label, String value) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 0 : 8), 
+            blurRadius: 8, 
+            offset: const Offset(0, 2)
+          )
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: const Color(0xFFF3E5F5), borderRadius: BorderRadius.circular(12)),
-            child: Icon(icon, color: Colors.deepPurple, size: 24),
+            decoration: BoxDecoration(
+              color: isDark ? theme.colorScheme.primary.withAlpha(50) : const Color(0xFFF3E5F5), 
+              borderRadius: BorderRadius.circular(12)
+            ),
+            child: Icon(icon, color: isDark ? theme.colorScheme.primary : Colors.deepPurple, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w600)),
+                Text(
+                  label, 
+                  style: TextStyle(
+                    fontSize: 12, 
+                    color: isDark ? Colors.white60 : Colors.grey, 
+                    fontWeight: FontWeight.w600
+                  )
+                ),
                 const SizedBox(height: 2),
-                Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+                Text(
+                  value, 
+                  style: TextStyle(
+                    fontSize: 16, 
+                    fontWeight: FontWeight.bold, 
+                    color: isDark ? Colors.white : const Color(0xFF311B92)
+                  )
+                ),
               ],
             ),
           ),

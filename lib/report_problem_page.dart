@@ -49,12 +49,17 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8F7FF), Color(0xFFEEEBFF)],
+          colors: isDark 
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)]
+            : [const Color(0xFFF8F7FF), const Color(0xFFEEEBFF)],
         ),
       ),
       child: Scaffold(
@@ -63,12 +68,15 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF311B92)),
+            icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : const Color(0xFF311B92)),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
+          title: Text(
             'Report a Problem',
-            style: TextStyle(color: Color(0xFF311B92), fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF311B92), 
+              fontWeight: FontWeight.bold
+            ),
           ),
           centerTitle: true,
         ),
@@ -76,20 +84,20 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              const Text(
+              Text(
                 'Help us improve CariIntern by reporting any issues you encounter.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+                style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black54),
               ),
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
+                      color: Colors.black.withAlpha(isDark ? 0 : 8),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -161,7 +169,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF311B92),
+                          backgroundColor: theme.colorScheme.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
@@ -188,52 +196,45 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 2,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.deepPurple.withValues(alpha: 0.4),
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-            BottomNavigationBarItem(
-              icon: CircleAvatar(
-                backgroundColor: Colors.deepPurple,
-                child: Icon(Icons.assignment_outlined, color: Colors.white),
-              ),
-              label: 'Status',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Saved'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-          ],
-        ),
       ),
     );
   }
 
   Widget _buildLabel(String label, {bool isRequired = false}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF311B92))),
+        Text(
+          label, 
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            fontSize: 15, 
+            color: isDark ? Colors.white : const Color(0xFF311B92)
+          )
+        ),
         if (isRequired) const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
       ],
     );
   }
 
   Widget _buildDropdownField() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FA),
+        color: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: isDark ? Colors.white12 : Colors.grey.shade200),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedCategory,
+          dropdownColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           hint: Row(
             children: [
-              Icon(Icons.assignment_outlined, color: Colors.deepPurple.shade300, size: 20),
+              Icon(Icons.assignment_outlined, color: theme.colorScheme.primary.withAlpha(150), size: 20),
               const SizedBox(width: 12),
               const Text('Select Issue Type', style: TextStyle(color: Colors.grey, fontSize: 14)),
             ],
@@ -242,7 +243,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
           items: _categories.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text(value, style: const TextStyle(fontSize: 14)),
+              child: Text(value, style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
             );
           }).toList(),
           onChanged: (newValue) {
@@ -256,24 +257,30 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   }
 
   Widget _buildTextField({required TextEditingController controller, required String hint, required IconData prefixIcon, IconData? suffixIcon}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return TextField(
       controller: controller,
+      style: TextStyle(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-        prefixIcon: Icon(prefixIcon, color: Colors.deepPurple.shade300, size: 20),
+        hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120), fontSize: 14),
+        prefixIcon: Icon(prefixIcon, color: theme.colorScheme.primary.withAlpha(150), size: 20),
         suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: Colors.grey, size: 20) : null,
         filled: true,
-        fillColor: const Color(0xFFF5F7FA),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.deepPurple, width: 1.5)),
+        fillColor: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
       ),
     );
   }
 
   Widget _buildSuggestionsList() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final query = _companyController.text.toLowerCase();
     final matches = _allCompanyNames.where((name) => name.toLowerCase().contains(query)).toList();
 
@@ -283,24 +290,24 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
       margin: const EdgeInsets.only(top: 4),
       constraints: const BoxConstraints(maxHeight: 200),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: isDark ? Colors.white12 : Colors.grey.shade200),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withAlpha(isDark ? 0 : 13), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: ListView.separated(
         shrinkWrap: true,
         padding: EdgeInsets.zero,
         itemCount: matches.length,
-        separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade100),
+        separatorBuilder: (context, index) => Divider(height: 1, color: isDark ? Colors.white12 : Colors.grey.shade100),
         itemBuilder: (context, index) {
           final name = matches[index];
           return ListTile(
             dense: true,
-            leading: const Icon(Icons.business_rounded, size: 18, color: Colors.deepPurple),
-            title: Text(name, style: const TextStyle(fontSize: 14)),
+            leading: Icon(Icons.business_rounded, size: 18, color: theme.colorScheme.primary),
+            title: Text(name, style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
             onTap: () {
               _companyController.text = name;
               _companyController.selection = TextSelection.fromPosition(TextPosition(offset: name.length));
@@ -316,24 +323,28 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   }
 
   Widget _buildDescriptionField() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Stack(
       children: [
         TextField(
           controller: _descriptionController,
           maxLines: 5,
           onChanged: (v) => setState(() {}),
+          style: TextStyle(color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: 'Describe your issue in detail...',
-            hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+            hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120), fontSize: 14),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(bottom: 80),
-              child: Icon(Icons.edit_outlined, color: Colors.deepPurple.shade300, size: 20),
+              child: Icon(Icons.edit_outlined, color: theme.colorScheme.primary.withAlpha(150), size: 20),
             ),
             filled: true,
-            fillColor: const Color(0xFFF5F7FA),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.deepPurple, width: 1.5)),
+            fillColor: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
           ),
         ),
         Positioned(
@@ -346,25 +357,34 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   }
 
   Widget _buildUploadBox() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FA),
+        color: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
         borderRadius: BorderRadius.circular(16),
       ),
       child: CustomPaint(
-        painter: DashedRectPainter(color: Colors.deepPurple.shade200),
+        painter: DashedRectPainter(color: isDark ? Colors.white24 : Colors.deepPurple.shade200),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.deepPurple.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.camera_alt_rounded, color: Colors.deepPurple),
+                decoration: BoxDecoration(color: theme.colorScheme.primary.withAlpha(25), borderRadius: BorderRadius.circular(12)),
+                child: Icon(Icons.camera_alt_rounded, color: theme.colorScheme.primary),
               ),
               const SizedBox(height: 12),
-              const Text('Add Screenshot', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+              Text(
+                'Add Screenshot', 
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, 
+                  color: isDark ? Colors.white : const Color(0xFF311B92)
+                )
+              ),
               const Text('JPG, PNG up to 5MB', style: TextStyle(fontSize: 12, color: Colors.grey)),
             ],
           ),
@@ -374,15 +394,18 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   }
 
   Widget _buildPriorityCard(String title, String subtitle, Color color) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     bool isSelected = _priority == title;
+
     return GestureDetector(
       onTap: () => setState(() => _priority = title),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? Colors.deepPurple : Colors.grey.shade200, width: 1.5),
+          border: Border.all(color: isSelected ? theme.colorScheme.primary : (isDark ? Colors.white12 : Colors.grey.shade200), width: 1.5),
         ),
         child: Column(
           children: [
@@ -393,20 +416,27 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                   height: 14,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: isSelected ? Colors.deepPurple : Colors.grey.shade400, width: 2),
+                    border: Border.all(color: isSelected ? theme.colorScheme.primary : Colors.grey.shade400, width: 2),
                   ),
                   child: Center(
                     child: Container(
                       width: 6,
                       height: 6,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: isSelected ? Colors.deepPurple : Colors.transparent),
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: isSelected ? theme.colorScheme.primary : Colors.transparent),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(width: 6, height: 6, decoration: BoxDecoration(shape: BoxShape.circle, color: color)),
                 const SizedBox(width: 4),
-                Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isSelected ? Colors.black87 : Colors.grey.shade600)),
+                Text(
+                  title, 
+                  style: TextStyle(
+                    fontSize: 13, 
+                    fontWeight: FontWeight.bold, 
+                    color: isSelected ? theme.colorScheme.onSurface : Colors.grey.shade600
+                  )
+                ),
               ],
             ),
             const SizedBox(height: 4),

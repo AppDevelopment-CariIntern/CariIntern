@@ -33,12 +33,17 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8F7FF), Color(0xFFEEEBFF)],
+          colors: isDark 
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)]
+            : [const Color(0xFFF8F7FF), const Color(0xFFEEEBFF)],
         ),
       ),
       child: Scaffold(
@@ -47,12 +52,15 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF311B92)),
+            icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : const Color(0xFF311B92)),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
+          title: Text(
             'Send Feedback',
-            style: TextStyle(color: Color(0xFF311B92), fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF311B92), 
+              fontWeight: FontWeight.bold
+            ),
           ),
           centerTitle: true,
         ),
@@ -60,20 +68,20 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              const Text(
+              Text(
                 'We value your opinion! Your feedback helps us improve CariIntern.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+                style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black54),
               ),
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
+                      color: Colors.black.withAlpha(isDark ? 0 : 8),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -132,19 +140,19 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                           child: Checkbox(
                             value: _contactPermission,
                             onChanged: (val) => setState(() => _contactPermission = val ?? false),
-                            activeColor: const Color(0xFF311B92),
+                            activeColor: theme.colorScheme.primary,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                           ),
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Yes, you may contact me for more details.', 
-                                style: TextStyle(fontSize: 14, color: Colors.black87)),
-                              SizedBox(height: 4),
-                              Text('If checked, please make sure your email is updated in your profile.',
+                                style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
+                              const SizedBox(height: 4),
+                              const Text('If checked, please make sure your email is updated in your profile.',
                                 style: TextStyle(fontSize: 11, color: Colors.grey)),
                             ],
                           ),
@@ -164,7 +172,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF311B92),
+                          backgroundColor: theme.colorScheme.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
@@ -191,37 +199,26 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 2,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.deepPurple.withValues(alpha: 0.4),
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-            BottomNavigationBarItem(
-              icon: CircleAvatar(
-                backgroundColor: Colors.deepPurple,
-                child: Icon(Icons.assignment_outlined, color: Colors.white),
-              ),
-              label: 'Status',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Saved'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-          ],
-        ),
       ),
     );
   }
 
   Widget _buildLabel(String label, {bool isRequired = false}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Row(
       children: [
         Expanded(
           child: RichText(
             text: TextSpan(
               text: label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF311B92), fontFamily: 'Inter'),
+              style: TextStyle(
+                fontWeight: FontWeight.bold, 
+                fontSize: 15, 
+                color: isDark ? Colors.white : const Color(0xFF311B92), 
+                fontFamily: 'Inter'
+              ),
               children: [
                 if (isRequired) const TextSpan(text: ' *', style: TextStyle(color: Colors.red)),
               ],
@@ -233,19 +230,23 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
   }
 
   Widget _buildDropdownField() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FA),
+        color: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: isDark ? Colors.white12 : Colors.grey.shade200),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedFeedbackType,
+          dropdownColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           hint: Row(
             children: [
-              Icon(Icons.list_alt_rounded, color: Colors.deepPurple.shade300, size: 20),
+              Icon(Icons.list_alt_rounded, color: theme.colorScheme.primary.withAlpha(150), size: 20),
               const SizedBox(width: 12),
               const Text('Select Feedback Type', style: TextStyle(color: Colors.grey, fontSize: 14)),
             ],
@@ -254,7 +255,10 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
           items: _feedbackTypes.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text(value, style: const TextStyle(fontSize: 14)),
+              child: Text(
+                value, 
+                style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)
+              ),
             );
           }).toList(),
           onChanged: (newValue) => setState(() => _selectedFeedbackType = newValue),
@@ -277,7 +281,10 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
   }
 
   Widget _buildStar(int index, String label) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     bool isSelected = _selectedRating >= index;
+
     return Column(
       children: [
         GestureDetector(
@@ -285,9 +292,9 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F7FA),
+              color: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isSelected ? Colors.deepPurple : Colors.grey.shade200),
+              border: Border.all(color: isSelected ? theme.colorScheme.primary : (isDark ? Colors.white12 : Colors.grey.shade200)),
             ),
             child: Icon(
               isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
@@ -305,24 +312,28 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
   }
 
   Widget _buildFeedbackField() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Stack(
       children: [
         TextField(
           controller: _feedbackController,
           maxLines: 4,
           onChanged: (v) => setState(() {}),
+          style: TextStyle(color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: 'Tell us what you think...',
-            hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+            hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120), fontSize: 14),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(bottom: 60),
-              child: Icon(Icons.edit_outlined, color: Colors.deepPurple.shade300, size: 20),
+              child: Icon(Icons.edit_outlined, color: theme.colorScheme.primary.withAlpha(150), size: 20),
             ),
             filled: true,
-            fillColor: const Color(0xFFF5F7FA),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.deepPurple, width: 1.5)),
+            fillColor: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
           ),
         ),
         Positioned(
@@ -335,17 +346,21 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
   }
 
   Widget _buildTextField({required TextEditingController controller, required String hint, required IconData prefixIcon}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return TextField(
       controller: controller,
+      style: TextStyle(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-        prefixIcon: Icon(prefixIcon, color: Colors.deepPurple.shade300, size: 20),
+        hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120), fontSize: 14),
+        prefixIcon: Icon(prefixIcon, color: theme.colorScheme.primary.withAlpha(150), size: 20),
         filled: true,
-        fillColor: const Color(0xFFF5F7FA),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.deepPurple, width: 1.5)),
+        fillColor: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5)),
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
       ),
     );

@@ -93,12 +93,17 @@ class _FAQPageState extends State<FAQPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8F7FF), Color(0xFFEEEBFF)],
+          colors: isDark 
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)]
+            : [const Color(0xFFF8F7FF), const Color(0xFFEEEBFF)],
         ),
       ),
       child: Scaffold(
@@ -107,12 +112,15 @@ class _FAQPageState extends State<FAQPage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF311B92)),
+            icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : const Color(0xFF311B92)),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
+          title: Text(
             'FAQ',
-            style: TextStyle(color: Color(0xFF311B92), fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF311B92), 
+              fontWeight: FontWeight.bold
+            ),
           ),
           centerTitle: true,
         ),
@@ -130,23 +138,27 @@ class _FAQPageState extends State<FAQPage> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.deepPurple.withValues(alpha: 0.1),
+                            color: theme.colorScheme.primary.withAlpha(25),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.help_center_rounded, size: 40, color: Colors.deepPurple),
+                          child: Icon(Icons.help_center_rounded, size: 40, color: theme.colorScheme.primary),
                         ),
                         const SizedBox(width: 16),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Frequently Asked Questions',
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF311B92)),
+                                style: TextStyle(
+                                  fontSize: 20, 
+                                  fontWeight: FontWeight.bold, 
+                                  color: isDark ? Colors.white : const Color(0xFF311B92)
+                                ),
                               ),
                               Text(
                                 'Find answers to common questions about CariIntern.',
-                                style: TextStyle(fontSize: 13, color: Colors.black54),
+                                style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black54),
                               ),
                             ],
                           ),
@@ -156,18 +168,26 @@ class _FAQPageState extends State<FAQPage> {
                     const SizedBox(height: 24),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(isDark ? 0 : 8), 
+                            blurRadius: 10, 
+                            offset: const Offset(0, 4)
+                          )
+                        ],
                       ),
                       child: TextField(
                         controller: _searchController,
                         onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: theme.colorScheme.onSurface),
+                        decoration: InputDecoration(
                           hintText: 'Search questions...',
-                          prefixIcon: Icon(Icons.search, color: Colors.grey),
+                          hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120)),
+                          prefixIcon: const Icon(Icons.search, color: Colors.grey),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 15),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 15),
                         ),
                       ),
                     ),
@@ -180,30 +200,14 @@ class _FAQPageState extends State<FAQPage> {
             ),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 2, // Highlight "Status" as seen in image
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.deepPurple.withValues(alpha: 0.4),
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-            BottomNavigationBarItem(
-              icon: CircleAvatar(
-                backgroundColor: Colors.deepPurple,
-                child: Icon(Icons.assignment_outlined, color: Colors.white),
-              ),
-              label: 'Status',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Saved'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-          ],
-        ),
       ),
     );
   }
 
   Widget _buildFAQSection(Map<String, dynamic> section) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final filteredItems = (section['items'] as List).where((item) {
       return item['question'].toString().toLowerCase().contains(_searchQuery) ||
              item['answer'].toString().toLowerCase().contains(_searchQuery);
@@ -219,7 +223,7 @@ class _FAQPageState extends State<FAQPage> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: (section['color'] as Color).withValues(alpha: 0.1),
+                color: (section['color'] as Color).withAlpha(25),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(section['icon'], size: 20, color: section['color']),
@@ -227,16 +231,26 @@ class _FAQPageState extends State<FAQPage> {
             const SizedBox(width: 12),
             Text(
               section['category'],
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF311B92)),
+              style: TextStyle(
+                fontSize: 16, 
+                fontWeight: FontWeight.bold, 
+                color: isDark ? Colors.white : const Color(0xFF311B92)
+              ),
             ),
           ],
         ),
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(isDark ? 0 : 5), 
+                blurRadius: 8, 
+                offset: const Offset(0, 2)
+              )
+            ],
           ),
           child: Column(
             children: filteredItems.asMap().entries.map((entry) {
@@ -247,12 +261,21 @@ class _FAQPageState extends State<FAQPage> {
               return Column(
                 children: [
                   Theme(
-                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                    data: Theme.of(context).copyWith(
+                      dividerColor: Colors.transparent,
+                      unselectedWidgetColor: isDark ? Colors.white70 : Colors.black54,
+                    ),
                     child: ExpansionTile(
                       initiallyExpanded: item['isInitiallyExpanded'] ?? false,
+                      iconColor: theme.colorScheme.primary,
+                      collapsedIconColor: isDark ? Colors.white70 : Colors.black54,
                       title: Text(
                         item['question'],
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
+                        style: TextStyle(
+                          fontSize: 14, 
+                          fontWeight: FontWeight.w600, 
+                          color: isDark ? Colors.white : Colors.black87
+                        ),
                       ),
                       children: [
                         Padding(
@@ -261,19 +284,23 @@ class _FAQPageState extends State<FAQPage> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F7FA),
+                              color: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               item['answer'],
-                              style: const TextStyle(fontSize: 13, color: Colors.black54, height: 1.5),
+                              style: TextStyle(
+                                fontSize: 13, 
+                                color: isDark ? Colors.white70 : Colors.black54, 
+                                height: 1.5
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  if (!isLast) Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1), indent: 16, endIndent: 16),
+                  if (!isLast) Divider(height: 1, color: Colors.grey.withAlpha(25), indent: 16, endIndent: 16),
                 ],
               );
             }).toList(),

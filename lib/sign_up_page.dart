@@ -99,13 +99,16 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F7FF),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.deepPurple),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -114,18 +117,18 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Create Account',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF311B92),
+                color: isDark ? Colors.white : const Color(0xFF311B92),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               "Let's get you started on your career journey!",
-              style: TextStyle(fontSize: 16, color: Colors.black54),
+              style: TextStyle(fontSize: 16, color: isDark ? Colors.white70 : Colors.black54),
             ),
             const SizedBox(height: 32),
             _buildTextField(label: 'Full Name', hint: 'Aiman Hakim', controller: _nameController, icon: Icons.person_outline),
@@ -147,19 +150,21 @@ class _SignUpPageState extends State<SignUpPage> {
                       _isAgreed = value ?? false;
                     });
                   },
-                  activeColor: Colors.deepPurple,
+                  activeColor: theme.colorScheme.primary,
+                  checkColor: Colors.white,
+                  side: BorderSide(color: isDark ? Colors.white54 : Colors.grey),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                 ),
                 Expanded(
                   child: RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       text: 'I agree to the ',
-                      style: TextStyle(color: Colors.black54, fontSize: 14),
+                      style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 14),
                       children: [
                         TextSpan(
                           text: 'Terms of Service and Privacy Policy',
                           style: TextStyle(
-                            color: Colors.deepPurple,
+                            color: theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -176,10 +181,10 @@ class _SignUpPageState extends State<SignUpPage> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _handleSignUp,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: theme.colorScheme.primary,
                   foregroundColor: Colors.white,
                   elevation: 4,
-                  shadowColor: Colors.deepPurple.withValues(alpha: 0.4),
+                  shadowColor: theme.colorScheme.primary.withAlpha(100),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: _isLoading 
@@ -197,14 +202,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   );
                 },
                 child: RichText(
-                  text: const TextSpan(
+                  text: TextSpan(
                     text: 'Already have an account? ',
-                    style: TextStyle(color: Colors.black54, fontSize: 15),
+                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 15),
                     children: [
                       TextSpan(
                         text: 'Log In',
                         style: TextStyle(
-                          color: Colors.deepPurple,
+                          color: theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -228,18 +233,28 @@ class _SignUpPageState extends State<SignUpPage> {
     TextInputType? keyboardType,
     IconData? icon,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF311B92))),
+        Text(
+          label, 
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            fontSize: 14, 
+            color: isDark ? Colors.white : const Color(0xFF311B92)
+          )
+        ),
         const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.deepPurple.withValues(alpha: 0.05),
+                color: Colors.black.withAlpha(isDark ? 0 : 13),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -249,10 +264,11 @@ class _SignUpPageState extends State<SignUpPage> {
             controller: controller,
             obscureText: isPassword,
             keyboardType: keyboardType,
+            style: TextStyle(color: theme.colorScheme.onSurface),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.grey.shade400),
-              prefixIcon: icon != null ? Icon(icon, color: Colors.deepPurple, size: 22) : null,
+              hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120)),
+              prefixIcon: icon != null ? Icon(icon, color: theme.colorScheme.primary, size: 22) : null,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             ),

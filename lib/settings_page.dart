@@ -48,16 +48,23 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Settings',
-          style: TextStyle(color: Color(0xFF311B92), fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF311B92), 
+            fontWeight: FontWeight.bold
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF311B92)),
+          icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : const Color(0xFF311B92)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -95,28 +102,34 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildSectionHeader(String title) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF311B92),
+          color: isDark ? Colors.white : const Color(0xFF311B92),
         ),
       ),
     );
   }
 
   Widget _buildSettingsItem({required IconData icon, required String title, required VoidCallback onTap}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withAlpha(isDark ? 0 : 13),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -124,8 +137,11 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       child: ListTile(
         onTap: onTap,
-        leading: Icon(icon, color: Colors.deepPurple),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+        leading: Icon(icon, color: theme.colorScheme.primary),
+        title: Text(
+          title, 
+          style: TextStyle(fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface)
+        ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
       ),
     );
@@ -137,47 +153,58 @@ class _SettingsPageState extends State<SettingsPage> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withAlpha(isDark ? 0 : 13),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ListTile(
-        leading: Icon(icon, color: Colors.deepPurple),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+        leading: Icon(icon, color: theme.colorScheme.primary),
+        title: Text(
+          title, 
+          style: TextStyle(fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface)
+        ),
         trailing: Switch(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: Colors.deepPurple,
+          activeColor: theme.colorScheme.primary,
         ),
       ),
     );
   }
 
   void _showChangePasswordDialog() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final TextEditingController currentPasswordController = TextEditingController();
     final TextEditingController newPasswordController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Change Password'),
+        backgroundColor: theme.colorScheme.surface,
+        title: Text('Change Password', style: TextStyle(color: theme.colorScheme.onSurface)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: currentPasswordController,
               obscureText: true,
+              style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
                 labelText: 'Current Password',
+                labelStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(150)),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
@@ -185,8 +212,10 @@ class _SettingsPageState extends State<SettingsPage> {
             TextField(
               controller: newPasswordController,
               obscureText: true,
+              style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
                 labelText: 'New Password',
+                labelStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(150)),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
@@ -233,7 +262,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 }
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: theme.colorScheme.primary, foregroundColor: Colors.white),
             child: const Text('Update'),
           ),
         ],

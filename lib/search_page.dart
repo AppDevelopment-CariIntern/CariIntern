@@ -22,12 +22,17 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8F7FF), Color(0xFFEEEBFF)],
+          colors: isDark 
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)]
+            : [const Color(0xFFF8F7FF), const Color(0xFFEEEBFF)],
         ),
       ),
       child: Scaffold(
@@ -39,22 +44,22 @@ class _SearchPageState extends State<SearchPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Search',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF311B92),
+                    color: isDark ? Colors.white : const Color(0xFF311B92),
                   ),
                 ),
                 const SizedBox(height: 20),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.deepPurple.withValues(alpha: 0.05),
+                        color: theme.colorScheme.primary.withAlpha(isDark ? 0 : 13),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -63,13 +68,14 @@ class _SearchPageState extends State<SearchPage> {
                   child: TextField(
                     controller: _searchController,
                     onChanged: (value) => _runFilter(value),
+                    style: TextStyle(color: theme.colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: 'Search companies or industries...',
-                      hintStyle: TextStyle(color: Colors.grey.shade400),
-                      prefixIcon: const Icon(Icons.search, color: Colors.deepPurple),
+                      hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120)),
+                      prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.clear, color: Colors.deepPurple),
+                              icon: Icon(Icons.clear, color: theme.colorScheme.primary),
                               onPressed: () {
                                 _searchController.clear();
                                 _runFilter('');
@@ -137,8 +143,8 @@ class _SearchPageState extends State<SearchPage> {
                         children: [
                           Text(
                             '${filteredCompanies.length} results found',
-                            style: const TextStyle(
-                              color: Colors.black54,
+                            style: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black54,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -149,13 +155,13 @@ class _SearchPageState extends State<SearchPage> {
                                     itemCount: filteredCompanies.length,
                                     itemBuilder: (context, index) => _buildSearchResultItem(filteredCompanies[index]),
                                   )
-                                : const Center(
+                                : Center(
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.search_off, size: 64, color: Colors.deepPurple),
-                                        SizedBox(height: 16),
-                                        Text(
+                                        Icon(Icons.search_off, size: 64, color: theme.colorScheme.primary),
+                                        const SizedBox(height: 16),
+                                        const Text(
                                           'No results found',
                                           style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
                                         ),
@@ -177,7 +183,10 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _filterChip(String label) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     bool isSelected = _selectedFilter == label;
+    
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -187,11 +196,11 @@ class _SearchPageState extends State<SearchPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.deepPurple : Colors.white,
+          color: isSelected ? theme.colorScheme.primary : (isDark ? const Color(0xFF2C2C2C) : Colors.white),
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: isSelected ? Colors.deepPurple.withValues(alpha: 0.2) : Colors.deepPurple.withValues(alpha: 0.05),
+              color: isSelected ? theme.colorScheme.primary.withAlpha(51) : Colors.black.withAlpha(isDark ? 0 : 13),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -199,7 +208,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
         child: Text( label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            color: isSelected ? Colors.white : theme.colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: 13,
           ),
@@ -209,12 +218,14 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildSearchResultItem(Map<String, dynamic> company) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     final String name = company['name'].toString();
     final String? imagePath = company['imagePath']?.toString().trim();
     final String? bannerPath = company['bannerPath']?.toString().trim();
     final String nameLower = name.toLowerCase();
     
-    // Unified sizing for specific logos
     final bool isSpecialLogo = nameLower.contains('petronas') || 
                                nameLower.contains('bosch') || 
                                nameLower.contains('cimb') || 
@@ -248,11 +259,11 @@ class _SearchPageState extends State<SearchPage> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.deepPurple.withValues(alpha: 0.05),
+              color: Colors.black.withAlpha(isDark ? 0 : 13),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -265,14 +276,14 @@ class _SearchPageState extends State<SearchPage> {
               width: 56, 
               padding: EdgeInsets.all(isSpecialLogo ? 0 : 4), 
               decoration: BoxDecoration(
-                color: (name == 'Maybank') ? const Color(0xFFFFD100) : const Color(0xFFF5F7FA),
+                color: (name == 'Maybank') ? const Color(0xFFFFD100) : (isDark ? Colors.grey[800] : const Color(0xFFF5F7FA)),
                 borderRadius: BorderRadius.circular(14),
               ),
               clipBehavior: Clip.antiAlias,
               child: Builder(
                 builder: (context) {
                   if (imagePath == null || imagePath.isEmpty) {
-                    return const Center(child: Icon(Icons.business, size: 28, color: Colors.deepPurple));
+                    return Center(child: Icon(Icons.business, size: 28, color: theme.colorScheme.primary));
                   }
 
                   Widget image = imagePath.startsWith('http')
@@ -282,7 +293,7 @@ class _SearchPageState extends State<SearchPage> {
                           height: 56,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) =>
-                              const Center(child: Icon(Icons.business, size: 28, color: Colors.deepPurple)),
+                              Center(child: Icon(Icons.business, size: 28, color: theme.colorScheme.primary)),
                         )
                       : Image.asset(
                           imagePath,
@@ -290,26 +301,26 @@ class _SearchPageState extends State<SearchPage> {
                           height: 56,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) =>
-                              const Center(child: Icon(Icons.business, size: 28, color: Colors.deepPurple)),
+                              Center(child: Icon(Icons.business, size: 28, color: theme.colorScheme.primary)),
                         );
 
                   double scale = 1.0;
                   if (nameLower.contains('bosch')) {
                     scale = 1.5;
                   } else if (nameLower.contains('cimb')) {
-                    scale = 1.4; // Upscaled
+                    scale = 1.4;
                   } else if (nameLower.contains('grab')) {
                     scale = 1.4;
                   } else if (nameLower.contains('deloitte')) {
-                    scale = 1.1; // Descaled
+                    scale = 1.1;
                   } else if (nameLower.contains('ey')) {
                     scale = 1.3;
                   } else if (nameLower.contains('kpmg')) {
-                    scale = 1.4; // Upscaled a bit
+                    scale = 1.4;
                   } else if (nameLower.contains('maybank')) {
-                    scale = 1.8; // Descaled a bit from 4.0
+                    scale = 1.8;
                   } else if (nameLower.contains('honeywell')) {
-                    scale = 0.05; // Descaled a bit from 0.2
+                    scale = 0.05;
                   }
                   
                   return scale != 1.0 ? Transform.scale(scale: scale, child: image) : image;
@@ -323,11 +334,15 @@ class _SearchPageState extends State<SearchPage> {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Color(0xFF311B92)),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 17, 
+                      color: isDark ? Colors.white : const Color(0xFF311B92)
+                    ),
                   ),
                   Text(
                     company['industry'].toString(),
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    style: TextStyle(color: isDark ? Colors.white60 : Colors.grey, fontSize: 14),
                   ),
                 ],
               ),
@@ -335,7 +350,7 @@ class _SearchPageState extends State<SearchPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3E5F5),
+                color: isDark ? theme.colorScheme.primary.withAlpha(51) : const Color(0xFFF3E5F5),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -343,7 +358,10 @@ class _SearchPageState extends State<SearchPage> {
                   const Icon(Icons.star_rounded, size: 18, color: Colors.amber),
                   Text(
                     ' ${company['rating']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      color: isDark ? Colors.white : Colors.deepPurple
+                    ),
                   ),
                 ],
               ),

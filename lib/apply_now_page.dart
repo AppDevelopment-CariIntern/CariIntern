@@ -59,33 +59,35 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
           'portfolio': _portfolioController.text.trim(),
           'status': 'Pending',
           'appliedAt': FieldValue.serverTimestamp(),
-          'userId': user.uid, // Explicitly using non-null user.uid
+          'userId': user.uid,
         });
 
         if (!mounted) return;
         setState(() => _isUploading = false);
         
+        final theme = Theme.of(context);
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
+            backgroundColor: theme.colorScheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: const Row(
+            title: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 28),
-                SizedBox(width: 12),
-                Text('Success!', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+                const Icon(Icons.check_circle, color: Colors.green, size: 28),
+                const SizedBox(width: 12),
+                Text('Success!', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
               ],
             ),
             content: Text('Your application for ${widget.position} at ${widget.companyName} has been submitted successfully.', 
-              style: const TextStyle(fontSize: 16)),
+              style: TextStyle(fontSize: 16, color: theme.colorScheme.onSurface)),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
                   Navigator.pop(context); // Go back to details page
                 },
-                child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple, fontSize: 16)),
+                child: Text('OK', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary, fontSize: 16)),
               ),
             ],
           ),
@@ -101,18 +103,21 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F7FF),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.deepPurple),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Apply Now',
-          style: TextStyle(color: Color(0xFF311B92), fontWeight: FontWeight.bold),
+          style: TextStyle(color: isDark ? Colors.white : const Color(0xFF311B92), fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -125,15 +130,17 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.deepPurple, Color(0xFF7C4DFF)],
+                  gradient: LinearGradient(
+                    colors: isDark 
+                        ? [theme.colorScheme.primary, theme.colorScheme.primary.withAlpha(180)]
+                        : [Colors.deepPurple, const Color(0xFF7C4DFF)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.deepPurple.withValues(alpha: 0.3),
+                      color: theme.colorScheme.primary.withAlpha(isDark ? 50 : 76),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -169,6 +176,7 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
               _buildLabel('Full Name'),
               TextFormField(
                 controller: _nameController,
+                style: TextStyle(color: theme.colorScheme.onSurface),
                 decoration: _inputDecoration('Enter your full name', Icons.person_outline),
                 validator: (value) => value!.isEmpty ? 'Please enter your name' : null,
               ),
@@ -178,6 +186,7 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
+                style: TextStyle(color: theme.colorScheme.onSurface),
                 decoration: _inputDecoration('Enter your email', Icons.email_outlined),
                 validator: (value) => value!.isEmpty ? 'Please enter your email' : null,
               ),
@@ -187,6 +196,7 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
               TextFormField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
+                style: TextStyle(color: theme.colorScheme.onSurface),
                 decoration: _inputDecoration('Enter your phone number', Icons.phone_outlined),
                 validator: (value) => value!.isEmpty ? 'Please enter your phone number' : null,
               ),
@@ -195,6 +205,7 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
               _buildLabel('Portfolio/LinkedIn URL (Optional)'),
               TextFormField(
                 controller: _portfolioController,
+                style: TextStyle(color: theme.colorScheme.onSurface),
                 decoration: _inputDecoration('https://linkedin.com/in/yourprofile', Icons.link),
               ),
               const SizedBox(height: 32),
@@ -203,11 +214,11 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
+                      color: Colors.black.withAlpha(isDark ? 0 : 13),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -218,23 +229,23 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF3E5F5),
+                        color: isDark ? theme.colorScheme.primary.withAlpha(51) : const Color(0xFFF3E5F5),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.description_outlined, color: Colors.deepPurple),
+                      child: Icon(Icons.description_outlined, color: theme.colorScheme.primary),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         _cvFileName,
-                        style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                        style: TextStyle(color: isDark ? Colors.white70 : Colors.grey.shade600, fontWeight: FontWeight.w500),
                       ),
                     ),
                     TextButton(
                       onPressed: () {
                         setState(() => _cvFileName = "resume_final.pdf");
                       },
-                      style: TextButton.styleFrom(foregroundColor: Colors.deepPurple),
+                      style: TextButton.styleFrom(foregroundColor: theme.colorScheme.primary),
                       child: const Text('Select File', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
@@ -248,10 +259,10 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
                 child: ElevatedButton(
                   onPressed: _isUploading ? null : _handleSubmit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: theme.colorScheme.primary,
                     foregroundColor: Colors.white,
                     elevation: 6,
-                    shadowColor: Colors.deepPurple.withValues(alpha: 0.4),
+                    shadowColor: theme.colorScheme.primary.withAlpha(102),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                   ),
                   child: _isUploading 
@@ -268,22 +279,26 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
   }
 
   Widget _buildLabel(String label) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0, left: 4),
       child: Text(
         label,
-        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF311B92), fontSize: 14),
+        style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF311B92), fontSize: 14),
       ),
     );
   }
 
   InputDecoration _inputDecoration(String hint, IconData icon) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-      prefixIcon: Icon(icon, color: Colors.deepPurple, size: 22),
+      hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120), fontSize: 14),
+      prefixIcon: Icon(icon, color: theme.colorScheme.primary, size: 22),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
@@ -294,7 +309,7 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.deepPurple, width: 1.5),
+        borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
     );

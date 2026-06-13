@@ -32,8 +32,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F7FF),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -46,7 +49,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     MaterialPageRoute(builder: (context) => const LoginPage()),
                   );
                 },
-                child: const Text('Skip', style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold)),
+                child: Text('Skip', style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
               ),
             ),
             Expanded(
@@ -68,11 +71,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           height: 240,
                           width: 240,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.deepPurple.withValues(alpha: 0.1),
+                                color: theme.colorScheme.primary.withAlpha(isDark ? 0 : 25),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -82,7 +85,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             child: Icon(
                               _onboardingData[index]['icon'] as IconData,
                               size: 100,
-                              color: Colors.deepPurple,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                         ),
@@ -90,19 +93,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         Text(
                           _onboardingData[index]['title']!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF311B92),
+                            color: isDark ? Colors.white : const Color(0xFF311B92),
                           ),
                         ),
                         const SizedBox(height: 20),
                         Text(
                           _onboardingData[index]['description']!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
-                            color: Colors.black54,
+                            color: isDark ? Colors.white70 : Colors.black54,
                             height: 1.6,
                           ),
                         ),
@@ -122,7 +125,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   height: 8,
                   width: _currentPage == index ? 24 : 8,
                   decoration: BoxDecoration(
-                    color: _currentPage == index ? Colors.deepPurple : Colors.deepPurple.withValues(alpha: 0.2),
+                    color: _currentPage == index ? theme.colorScheme.primary : theme.colorScheme.primary.withAlpha(50),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -149,10 +152,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: theme.colorScheme.primary,
                     foregroundColor: Colors.white,
                     elevation: 4,
-                    shadowColor: Colors.deepPurple.withValues(alpha: 0.4),
+                    shadowColor: theme.colorScheme.primary.withAlpha(100),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),

@@ -41,9 +41,10 @@ class _Dashboard2State extends State<Dashboard2> {
   }
 
   void _showNotifications() {
+    final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
       ),
@@ -59,26 +60,26 @@ class _Dashboard2State extends State<Dashboard2> {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Notifications',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: theme.colorScheme.primary),
                       ),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple.withAlpha(25),
+                          color: theme.colorScheme.primary.withAlpha(25),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Sample Data',
-                          style: TextStyle(fontSize: 10, color: Colors.deepPurple, fontWeight: FontWeight.w600),
+                          style: TextStyle(fontSize: 10, color: theme.colorScheme.primary, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: Icon(Icons.close, color: theme.colorScheme.onSurface),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -101,20 +102,24 @@ class _Dashboard2State extends State<Dashboard2> {
   }
 
   Widget _notificationItem(String title, String subtitle, String time) {
+    final theme = Theme.of(context);
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: CircleAvatar(
-        backgroundColor: Colors.deepPurple.withAlpha(25),
-        child: const Icon(Icons.notifications_outlined, color: Colors.deepPurple, size: 20),
+        backgroundColor: theme.colorScheme.primary.withAlpha(25),
+        child: Icon(Icons.notifications_outlined, color: theme.colorScheme.primary, size: 20),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle, style: const TextStyle(fontSize: 13)),
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+      subtitle: Text(subtitle, style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant)),
       trailing: Text(time, style: const TextStyle(fontSize: 11, color: Colors.grey)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     Widget currentBody;
     if (_selectedIndex == 0) {
       currentBody = const ApplicationsPage();
@@ -131,11 +136,13 @@ class _Dashboard2State extends State<Dashboard2> {
     }
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8F7FF), Color(0xFFEEEBFF)],
+          colors: isDark 
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)]
+            : [const Color(0xFFF8F7FF), const Color(0xFFEEEBFF)],
         ),
       ),
       child: Scaffold(
@@ -151,14 +158,14 @@ class _Dashboard2State extends State<Dashboard2> {
                 fontSize: 24,
               ),
               children: [
-                const TextSpan(text: 'Cari', style: TextStyle(color: Colors.black)),
-                const TextSpan(text: 'Intern', style: TextStyle(color: Colors.deepPurple)),
+                TextSpan(text: 'Cari', style: TextStyle(color: theme.colorScheme.onSurface)),
+                TextSpan(text: 'Intern', style: TextStyle(color: theme.colorScheme.primary)),
               ],
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications_none_outlined, color: Colors.deepPurple),
+              icon: Icon(Icons.notifications_none_outlined, color: theme.colorScheme.primary),
               onPressed: _showNotifications,
             ),
             Padding(
@@ -178,9 +185,9 @@ class _Dashboard2State extends State<Dashboard2> {
                     }
                     return CircleAvatar(
                       radius: 18,
-                      backgroundColor: const Color(0xFFEDE7F6),
+                      backgroundColor: isDark ? Colors.grey[800] : const Color(0xFFEDE7F6),
                       backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                      child: photoUrl == null ? const Icon(Icons.person_outline, color: Colors.deepPurple) : null,
+                      child: photoUrl == null ? Icon(Icons.person_outline, color: theme.colorScheme.primary) : null,
                     );
                   }
                 ),
@@ -192,25 +199,26 @@ class _Dashboard2State extends State<Dashboard2> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.deepPurple.withAlpha(102),
+          backgroundColor: theme.colorScheme.surface,
+          selectedItemColor: theme.colorScheme.primary,
+          unselectedItemColor: theme.colorScheme.onSurface.withAlpha(100),
           showSelectedLabels: true,
           showUnselectedLabels: true,
           onTap: (index) {
             setState(() => _selectedIndex = index);
           },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), label: 'Status'),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          items: [
+            const BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), label: 'Status'),
+            const BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
             BottomNavigationBarItem(
               icon: CircleAvatar(
-                backgroundColor: Colors.deepPurple,
-                child: Icon(Icons.home_filled, color: Colors.white),
+                backgroundColor: theme.colorScheme.primary,
+                child: const Icon(Icons.home_filled, color: Colors.white),
               ),
               label: 'Home',
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Saved'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
+            const BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Saved'),
+            const BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
           ],
         ),
       ),
@@ -218,6 +226,9 @@ class _Dashboard2State extends State<Dashboard2> {
   }
 
   Widget _buildHomeView() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -226,21 +237,28 @@ class _Dashboard2State extends State<Dashboard2> {
           const SizedBox(height: 10),
           Text(
             'Hi, ${widget.username} 👋',
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF311B92)),
+            style: TextStyle(
+              fontSize: 28, 
+              fontWeight: FontWeight.bold, 
+              color: isDark ? Colors.white : const Color(0xFF311B92)
+            ),
           ),
-          const Text(
+          Text(
             'Find the right place to grow your career.',
-            style: TextStyle(color: Colors.black54, fontSize: 16),
+            style: TextStyle(
+              color: isDark ? Colors.white70 : Colors.black54, 
+              fontSize: 16
+            ),
           ),
           const SizedBox(height: 24),
           
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.deepPurple.withAlpha(13),
+                  color: theme.colorScheme.primary.withAlpha(isDark ? 0 : 13),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -253,9 +271,11 @@ class _Dashboard2State extends State<Dashboard2> {
                 });
               },
               readOnly: true,
+              style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
                 hintText: 'Search company, position or keyword...',
-                prefixIcon: const Icon(Icons.search, color: Colors.deepPurple),
+                hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120)),
+                prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide.none,
@@ -269,15 +289,17 @@ class _Dashboard2State extends State<Dashboard2> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Colors.deepPurple, Color(0xFF7C4DFF)],
+              gradient: LinearGradient(
+                colors: isDark 
+                  ? [theme.colorScheme.primary, theme.colorScheme.primary.withAlpha(180)]
+                  : [Colors.deepPurple, const Color(0xFF7C4DFF)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.deepPurple.withAlpha(76),
+                  color: theme.colorScheme.primary.withAlpha(isDark ? 50 : 76),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
@@ -322,12 +344,22 @@ class _Dashboard2State extends State<Dashboard2> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Top-Rated Companies', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+              Text(
+                'Top-Rated Companies', 
+                style: TextStyle(
+                  fontSize: 20, 
+                  fontWeight: FontWeight.bold, 
+                  color: isDark ? Colors.white : const Color(0xFF311B92)
+                )
+              ),
               TextButton(
                 onPressed: () {
                   setState(() => _selectedIndex = 1);
                 }, 
-                child: const Text('See All', style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold))
+                child: Text(
+                  'See All', 
+                  style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)
+                )
               ),
             ],
           ),
@@ -357,7 +389,14 @@ class _Dashboard2State extends State<Dashboard2> {
           ),
           const SizedBox(height: 32),
           
-          const Text('Recent Reviews', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+          Text(
+            'Recent Reviews', 
+            style: TextStyle(
+              fontSize: 20, 
+              fontWeight: FontWeight.bold, 
+              color: isDark ? Colors.white : const Color(0xFF311B92)
+            )
+          ),
           const SizedBox(height: 16),
           _buildReviewCard('Microsoft Malaysia', 'Software Dev Intern', 'Aug 2026 - Jan 2027', 4.8),
           _buildReviewCard('Tesla', 'AI Engineer Intern', 'Jan 2026 - July 2026', 4.9),
@@ -370,6 +409,9 @@ class _Dashboard2State extends State<Dashboard2> {
   }
 
   Widget _buildProfileView() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SafeArea(
       child: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('users').doc(_user?.uid).snapshots(),
@@ -399,25 +441,32 @@ class _Dashboard2State extends State<Dashboard2> {
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.deepPurple, width: 2),
+                    border: Border.all(color: theme.colorScheme.primary, width: 2),
                   ),
                   child: CircleAvatar(
                     radius: 50, 
-                    backgroundColor: const Color(0xFFEDE7F6), 
+                    backgroundColor: isDark ? Colors.grey[800] : const Color(0xFFEDE7F6), 
                     backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                    child: photoUrl == null ? const Icon(Icons.person, size: 60, color: Colors.deepPurple) : null,
+                    child: photoUrl == null ? Icon(Icons.person, size: 60, color: theme.colorScheme.primary) : null,
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
-                Text(email, style: const TextStyle(color: Colors.grey, fontSize: 16)),
+                Text(
+                  name, 
+                  style: TextStyle(
+                    fontSize: 24, 
+                    fontWeight: FontWeight.bold, 
+                    color: isDark ? Colors.white : const Color(0xFF311B92)
+                  )
+                ),
+                Text(email, style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 16)),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.phone_outlined, size: 16, color: Colors.grey),
+                    Icon(Icons.phone_outlined, size: 16, color: isDark ? Colors.white60 : Colors.grey),
                     const SizedBox(width: 4),
-                    Text(phone, style: const TextStyle(color: Colors.grey)),
+                    Text(phone, style: TextStyle(color: isDark ? Colors.white60 : Colors.grey)),
                   ],
                 ),
                 const SizedBox(height: 40),
@@ -485,14 +534,17 @@ class _Dashboard2State extends State<Dashboard2> {
   }
 
   Widget _profileItem(IconData icon, String title, {String? subtitle, VoidCallback? onTap}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.deepPurple.withAlpha(13),
+            color: theme.colorScheme.primary.withAlpha(isDark ? 0 : 13),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -500,15 +552,18 @@ class _Dashboard2State extends State<Dashboard2> {
       ),
       child: ListTile(
         onTap: onTap,
-        leading: Icon(icon, color: Colors.deepPurple),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(fontSize: 12)) : null,
+        leading: Icon(icon, color: theme.colorScheme.primary),
+        title: Text(title, style: TextStyle(fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface)),
+        subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)) : null,
         trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
       ),
     );
   }
 
   Widget _buildCompanyCard(Map<String, dynamic> company) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final String name = company['name']?.toString() ?? 'Unknown';
     final String industry = company['industry']?.toString() ?? 'Technology';
     final String rating = company['rating']?.toString() ?? '0.0';
@@ -560,11 +615,11 @@ class _Dashboard2State extends State<Dashboard2> {
         margin: const EdgeInsets.only(right: 16, bottom: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.deepPurple.withAlpha(20),
+              color: theme.colorScheme.primary.withAlpha(isDark ? 0 : 20),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -575,11 +630,10 @@ class _Dashboard2State extends State<Dashboard2> {
           children: [
             Container(
               height: 75,
-              width: 75, // Standard square frame
-              // Reduce padding for specific logos to upscale the image within the frame
+              width: 75,
               padding: EdgeInsets.all(isWideLogo ? 0 : 8),
               decoration: BoxDecoration(
-                color: (name == 'Maybank') ? const Color(0xFFFFD100) : const Color(0xFFF5F7FA), 
+                color: (name == 'Maybank') ? const Color(0xFFFFD100) : (isDark ? Colors.grey[800] : const Color(0xFFF5F7FA)), 
                 borderRadius: BorderRadius.circular(16),
               ),
               clipBehavior: Clip.antiAlias,
@@ -593,7 +647,7 @@ class _Dashboard2State extends State<Dashboard2> {
                         width: 75,
                         height: 75,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.business, size: 30, color: Colors.deepPurple)),
+                        errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.business, size: 30, color: theme.colorScheme.primary)),
                       );
                     } else {
                       image = Image.asset(
@@ -601,11 +655,11 @@ class _Dashboard2State extends State<Dashboard2> {
                         width: 75,
                         height: 75,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.business, size: 30, color: Colors.deepPurple)),
+                        errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.business, size: 30, color: theme.colorScheme.primary)),
                       );
                     }
                   } else {
-                    image = const Center(child: Icon(Icons.business, size: 30, color: Colors.deepPurple));
+                    image = Center(child: Icon(Icons.business, size: 30, color: theme.colorScheme.primary));
                   }
                   
                   double scale = 1.0;
@@ -624,9 +678,9 @@ class _Dashboard2State extends State<Dashboard2> {
                   } else if (nameLower.contains('iprice')) {
                     scale = 3.2; 
                   } else if (nameLower.contains('maybank')) {
-                    scale = 2.0; // Descaled from 3.5 to 2.0
+                    scale = 2.0;
                   } else if (nameLower.contains('honeywell')) {
-                    scale = 0.04; // Descaled from 0.05 to 0.04
+                    scale = 0.04;
                   } else if (needsZoom) {
                     scale = 1.1;
                   }
@@ -636,13 +690,26 @@ class _Dashboard2State extends State<Dashboard2> {
               ),
             ),
             const Spacer(),
-            Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
-            Text(industry, style: const TextStyle(fontSize: 12, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(
+              name, 
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.colorScheme.onSurface), 
+              maxLines: 1, 
+              overflow: TextOverflow.ellipsis
+            ),
+            Text(
+              industry, 
+              style: const TextStyle(fontSize: 12, color: Colors.grey), 
+              maxLines: 1, 
+              overflow: TextOverflow.ellipsis
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
                 const Icon(Icons.star_rounded, size: 18, color: Colors.amber),
-                Text(' $rating', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                Text(
+                  ' $rating', 
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)
+                ),
               ],
             ),
           ],
@@ -652,6 +719,9 @@ class _Dashboard2State extends State<Dashboard2> {
   }
 
   Widget _buildReviewCard(String companyName, String position, String duration, double rating) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final String nameLower = companyName.toLowerCase();
     final bool isReducedPadding = nameLower.contains('bosch') || 
                                  nameLower.contains('iprice') || 
@@ -665,13 +735,11 @@ class _Dashboard2State extends State<Dashboard2> {
     
     return GestureDetector(
       onTap: () async {
-        // We attempt to find the company data in our local list first
         final localData = CompanyService().companiesData.firstWhere(
           (c) => c['name'] == companyName || companyName.contains(c['name'].toString()),
           orElse: () => <String, dynamic>{},
         );
 
-        // If it's empty, we fetch from Firestore but specifically for details
         Map<String, dynamic> data = localData;
         if (data.isEmpty) {
           final doc = await FirebaseFirestore.instance.collection('companies').doc(companyName).get();
@@ -701,11 +769,11 @@ class _Dashboard2State extends State<Dashboard2> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.deepPurple.withAlpha(10),
+              color: theme.colorScheme.primary.withAlpha(isDark ? 0 : 10),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -715,11 +783,10 @@ class _Dashboard2State extends State<Dashboard2> {
           children: [
             Container(
               height: 52,
-              width: 52, // Standard square frame
-              // Reduce padding for specific logos to upscale image
+              width: 52,
               padding: EdgeInsets.all(isReducedPadding ? 0 : 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F7FA),
+                color: isDark ? Colors.grey[800] : const Color(0xFFF5F7FA),
                 borderRadius: BorderRadius.circular(14),
               ),
               clipBehavior: Clip.antiAlias,
@@ -730,22 +797,38 @@ class _Dashboard2State extends State<Dashboard2> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(companyName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text(position, style: const TextStyle(fontSize: 13, color: Colors.black87)),
-                  Text(duration, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                  Text(
+                    companyName, 
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: theme.colorScheme.onSurface)
+                  ),
+                  Text(
+                    position, 
+                    style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)
+                  ),
+                  Text(
+                    duration, 
+                    style: const TextStyle(fontSize: 12, color: Colors.grey)
+                  ),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3E5F5),
+                color: theme.colorScheme.primary.withAlpha(isDark ? 40 : 25),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.star_rounded, size: 16, color: Colors.amber),
-                  Text(' $rating', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+                  Text(
+                    ' $rating', 
+                    style: TextStyle(
+                      fontSize: 13, 
+                      fontWeight: FontWeight.bold, 
+                      color: isDark ? Colors.white : Colors.deepPurple
+                    )
+                  ),
                 ],
               ),
             ),
@@ -756,6 +839,7 @@ class _Dashboard2State extends State<Dashboard2> {
   }
 
   Widget _buildReviewLogo(String companyName) {
+    final theme = Theme.of(context);
     final company = CompanyService().companiesData.firstWhere(
       (c) {
         final name = c['name']?.toString() ?? '';
@@ -777,7 +861,7 @@ class _Dashboard2State extends State<Dashboard2> {
                            nameLower.contains('honeywell');
 
     if (path == null || path.isEmpty) {
-      return const Center(child: Icon(Icons.business, color: Colors.deepPurple, size: 24));
+      return Center(child: Icon(Icons.business, color: theme.colorScheme.primary, size: 24));
     }
 
     Widget image;
@@ -787,7 +871,7 @@ class _Dashboard2State extends State<Dashboard2> {
         width: 52,
         height: 52,
         fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.business, color: Colors.deepPurple, size: 24)),
+        errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.business, color: theme.colorScheme.primary, size: 24)),
       );
     } else {
       image = Image.asset(
@@ -795,7 +879,7 @@ class _Dashboard2State extends State<Dashboard2> {
         width: 52,
         height: 52,
         fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.business, color: Colors.deepPurple, size: 24)),
+        errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.business, color: theme.colorScheme.primary, size: 24)),
       );
     }
 
@@ -815,9 +899,9 @@ class _Dashboard2State extends State<Dashboard2> {
     } else if (nameLower.contains('iprice')) {
       scale = 2.5; 
     } else if (nameLower.contains('maybank')) {
-      scale = 2.0; // Descaled from 3.5 to 2.0
+      scale = 2.0;
     } else if (nameLower.contains('honeywell')) {
-      scale = 0.04; // Descaled from 0.05 to 0.04
+      scale = 0.04;
     } else if (needsZoom) {
       scale = 1.1;
     }

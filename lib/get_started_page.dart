@@ -6,15 +6,20 @@ class GetStartedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF3F2B96), Color(0xFF241468)],
+            colors: isDark 
+              ? [const Color(0xFF1A1A1A), const Color(0xFF000000)]
+              : [const Color(0xFF3F2B96), const Color(0xFF241468)],
           ),
         ),
         child: Stack(
@@ -36,7 +41,7 @@ class GetStartedPage extends StatelessWidget {
                           children: [
                             const SizedBox(height: 50),
                             // App Logo Section
-                            _buildAppLogo(),
+                            _buildAppLogo(theme),
                             const SizedBox(height: 24),
                             RichText(
                               text: TextSpan(
@@ -46,9 +51,9 @@ class GetStartedPage extends StatelessWidget {
                                   letterSpacing: 1.0,
                                 ),
                                 children: [
-                                  const TextSpan(
+                                  TextSpan(
                                     text: 'Cari',
-                                    style: TextStyle(color: Colors.black),
+                                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
                                   ),
                                   TextSpan(
                                     text: 'Intern',
@@ -58,13 +63,13 @@ class GetStartedPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 40.0),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 40.0),
                               child: Text(
                                 'Real reviews. Real experiences.\nBetter internship decisions.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: isDark ? Colors.white70 : Colors.white70,
                                   fontSize: 16,
                                   height: 1.4,
                                   fontWeight: FontWeight.w400,
@@ -74,12 +79,12 @@ class GetStartedPage extends StatelessWidget {
                             const Spacer(),
                             
                             // Dynamic Hero Section
-                            _buildHeroSection(),
+                            _buildHeroSection(theme),
                             
                             const Spacer(),
                             
                             // Get Started Button
-                            _buildGetStartedButton(context),
+                            _buildGetStartedButton(context, theme),
                             const SizedBox(height: 20),
                           ],
                         ),
@@ -95,20 +100,20 @@ class GetStartedPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAppLogo() {
+  Widget _buildAppLogo(ThemeData theme) {
     return Container(
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: Colors.white.withAlpha(51),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: Colors.white.withAlpha(25)),
       ),
       child: const Icon(Icons.search, color: Colors.white, size: 45),
     );
   }
 
-  Widget _buildHeroSection() {
+  Widget _buildHeroSection(ThemeData theme) {
     return SizedBox(
       height: 320,
       width: double.infinity,
@@ -123,7 +128,7 @@ class GetStartedPage extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Colors.white.withAlpha(12),
                   blurRadius: 60,
                   spreadRadius: 20,
                 ),
@@ -134,9 +139,9 @@ class GetStartedPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: Colors.white.withAlpha(25),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              border: Border.all(color: Colors.white.withAlpha(51)),
             ),
             child: const Icon(
               Icons.rocket_launch_rounded,
@@ -185,12 +190,12 @@ class GetStartedPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
+          color: Colors.white.withAlpha(25),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          border: Border.all(color: Colors.white.withAlpha(25)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withAlpha(25),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -211,7 +216,7 @@ class GetStartedPage extends StatelessWidget {
                 ),
                 Text(
                   subLabel,
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 10),
+                  style: TextStyle(color: Colors.white.withAlpha(153), fontSize: 10),
                 ),
               ],
             ),
@@ -221,7 +226,8 @@ class GetStartedPage extends StatelessWidget {
     );
   }
 
-  Widget _buildGetStartedButton(BuildContext context) {
+  Widget _buildGetStartedButton(BuildContext context, ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
       child: SizedBox(
@@ -236,7 +242,7 @@ class GetStartedPage extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
-            foregroundColor: const Color(0xFF241468),
+            foregroundColor: isDark ? Colors.black : const Color(0xFF241468),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             elevation: 0,
           ),
@@ -256,7 +262,7 @@ class GetStartedPage extends StatelessWidget {
               margin: const EdgeInsets.all(4),
               width: 3,
               height: 3,
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Colors.white.withAlpha(51), shape: BoxShape.circle),
             ),
           ),
         ),

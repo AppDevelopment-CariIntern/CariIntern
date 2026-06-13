@@ -34,12 +34,17 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8F7FF), Color(0xFFEEEBFF)],
+          colors: isDark 
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)]
+            : [const Color(0xFFF8F7FF), const Color(0xFFEEEBFF)],
         ),
       ),
       child: Scaffold(
@@ -48,12 +53,15 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF311B92)),
+            icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : const Color(0xFF311B92)),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
+          title: Text(
             'Contact Support',
-            style: TextStyle(color: Color(0xFF311B92), fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF311B92), 
+              fontWeight: FontWeight.bold
+            ),
           ),
           centerTitle: true,
         ),
@@ -65,7 +73,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -74,15 +82,15 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black87,
+                            color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           'Reach out to us\nif you need any assistance.',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black54,
+                            color: isDark ? Colors.white70 : Colors.black54,
                             height: 1.4,
                           ),
                         ),
@@ -90,18 +98,17 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  // Illustration Placeholder
                   Container(
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple.withValues(alpha: 0.1),
+                      color: theme.colorScheme.primary.withAlpha(25),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.support_agent_rounded,
                       size: 60,
-                      color: Colors.deepPurple,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
                 ],
@@ -110,14 +117,14 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
               
               Row(
                 children: [
-                  Icon(Icons.headset_mic_outlined, size: 20, color: Colors.deepPurple.shade300),
+                  Icon(Icons.headset_mic_outlined, size: 20, color: theme.colorScheme.primary.withAlpha(150)),
                   const SizedBox(width: 12),
-                  const Text(
+                  Text(
                     'Our Support Channels',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF311B92),
+                      color: isDark ? Colors.white : const Color(0xFF311B92),
                     ),
                   ),
                 ],
@@ -136,7 +143,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                     'Email Support',
                     'support@cariintern.com',
                     Icons.email_outlined,
-                    const Color(0xFFE8EAF6),
+                    isDark ? Colors.indigo.withAlpha(50) : const Color(0xFFE8EAF6),
                     Colors.indigo,
                     badge: '24 hours',
                   ),
@@ -144,7 +151,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                     'Phone Support',
                     '+60 11-1234 5678',
                     Icons.phone_outlined,
-                    const Color(0xFFE8F5E9),
+                    isDark ? Colors.teal.withAlpha(50) : const Color(0xFFE8F5E9),
                     Colors.teal,
                     subtitle2: 'Mon - Fri, 9:00 AM - 6:00 PM\n(MYT)',
                   ),
@@ -152,7 +159,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                     'Operating Hours',
                     'Monday - Friday\n9:00 AM - 6:00 PM (MYT)',
                     Icons.access_time_rounded,
-                    const Color(0xFFFFF3E0),
+                    isDark ? Colors.orange.withAlpha(50) : const Color(0xFFFFF3E0),
                     Colors.orange,
                     subtitle2: 'Closed on weekends\n& public holidays',
                   ),
@@ -164,10 +171,10 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(color: Colors.black.withAlpha(isDark ? 0 : 8), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
                 ),
                 child: Form(
@@ -180,20 +187,24 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.deepPurple.withValues(alpha: 0.1),
+                              color: theme.colorScheme.primary.withAlpha(25),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.send_rounded, size: 20, color: Colors.deepPurple),
+                            child: Icon(Icons.send_rounded, size: 20, color: theme.colorScheme.primary),
                           ),
                           const SizedBox(width: 12),
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Send us a message',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF311B92)),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, 
+                                  fontSize: 16, 
+                                  color: isDark ? Colors.white : const Color(0xFF311B92)
+                                ),
                               ),
-                              Text(
+                              const Text(
                                 'Fill in the form below and we\'ll get back to you.',
                                 style: TextStyle(fontSize: 12, color: Colors.grey),
                               ),
@@ -206,6 +217,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                         children: [
                           Expanded(
                             child: _buildInputField(
+                              context,
                               'Your Name',
                               _nameController,
                               Icons.person_outline_rounded,
@@ -215,6 +227,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildInputField(
+                              context,
                               'Your Email',
                               _emailController,
                               Icons.email_outlined,
@@ -225,15 +238,20 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                       ),
                       const SizedBox(height: 16),
                       _buildInputField(
+                        context,
                         'Subject',
                         _subjectController,
                         Icons.chat_bubble_outline_rounded,
                         'What is your message about?',
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Message',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF311B92)),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 13, 
+                          color: isDark ? Colors.white : const Color(0xFF311B92)
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Stack(
@@ -241,15 +259,16 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                           TextFormField(
                             controller: _messageController,
                             maxLines: 4,
+                            style: TextStyle(color: theme.colorScheme.onSurface),
                             decoration: InputDecoration(
                               hintText: 'Describe your issue or question...',
-                              hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+                              hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120), fontSize: 13),
                               prefixIcon: Padding(
                                 padding: const EdgeInsets.only(bottom: 60),
-                                child: Icon(Icons.edit_outlined, color: Colors.deepPurple.shade300, size: 20),
+                                child: Icon(Icons.edit_outlined, color: theme.colorScheme.primary.withAlpha(150), size: 20),
                               ),
                               filled: true,
-                              fillColor: const Color(0xFFF5F7FA),
+                              fillColor: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                             ),
                           ),
@@ -280,7 +299,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF311B92),
+                            backgroundColor: theme.colorScheme.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
@@ -297,14 +316,14 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
               
               Row(
                 children: [
-                  Icon(Icons.link_rounded, size: 20, color: Colors.deepPurple.shade300),
+                  Icon(Icons.link_rounded, size: 20, color: theme.colorScheme.primary.withAlpha(150)),
                   const SizedBox(width: 12),
-                  const Text(
+                  Text(
                     'Helpful Links',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF311B92),
+                      color: isDark ? Colors.white : const Color(0xFF311B92),
                     ),
                   ),
                 ],
@@ -316,6 +335,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                 child: Row(
                   children: [
                     _buildHelpfulLink(
+                      context,
                       'FAQ',
                       'View common\nquestions',
                       Icons.help_center_rounded,
@@ -323,6 +343,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                     ),
                     const SizedBox(width: 12),
                     _buildHelpfulLink(
+                      context,
                       'Report a Problem',
                       'Report bugs or\ntechnical issues',
                       Icons.error_outline_rounded,
@@ -335,37 +356,21 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 2,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.deepPurple.withValues(alpha: 0.4),
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-            BottomNavigationBarItem(
-              icon: CircleAvatar(
-                backgroundColor: Colors.deepPurple,
-                child: Icon(Icons.assignment_outlined, color: Colors.white),
-              ),
-              label: 'Status',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Saved'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-          ],
-        ),
       ),
     );
   }
 
   Widget _buildChannelCard(String title, String subtitle, IconData icon, Color bgColor, Color iconColor, {String? badge, String? subtitle2}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(color: Colors.black.withAlpha(isDark ? 0 : 5), blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -386,15 +391,27 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF311B92))),
-          Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.black87), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(
+            title, 
+            style: TextStyle(
+              fontWeight: FontWeight.bold, 
+              fontSize: 13, 
+              color: isDark ? Colors.white : const Color(0xFF311B92)
+            )
+          ),
+          Text(
+            subtitle, 
+            style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.black87), 
+            maxLines: 1, 
+            overflow: TextOverflow.ellipsis
+          ),
           if (subtitle2 != null) Text(subtitle2, style: const TextStyle(fontSize: 10, color: Colors.grey), maxLines: 2, overflow: TextOverflow.ellipsis),
           if (badge != null)
             Container(
               margin: const EdgeInsets.only(top: 4),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
+                color: iconColor.withAlpha(25),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -407,23 +424,31 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller, IconData icon, String hint) {
+  Widget _buildInputField(BuildContext context, String label, TextEditingController controller, IconData icon, String hint) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF311B92)),
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            fontSize: 13, 
+            color: isDark ? Colors.white : const Color(0xFF311B92)
+          ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          style: TextStyle(color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-            prefixIcon: Icon(icon, color: Colors.deepPurple.shade300, size: 20),
+            hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120), fontSize: 13),
+            prefixIcon: Icon(icon, color: theme.colorScheme.primary.withAlpha(150), size: 20),
             filled: true,
-            fillColor: const Color(0xFFF5F7FA),
+            fillColor: isDark ? Colors.grey[850] : const Color(0xFFF5F7FA),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             contentPadding: const EdgeInsets.symmetric(vertical: 16),
           ),
@@ -432,17 +457,20 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     );
   }
 
-  Widget _buildHelpfulLink(String title, String subtitle, IconData icon, {VoidCallback? onTap}) {
+  Widget _buildHelpfulLink(BuildContext context, String title, String subtitle, IconData icon, {VoidCallback? onTap}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 140,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
+            BoxShadow(color: Colors.black.withAlpha(isDark ? 0 : 5), blurRadius: 8, offset: const Offset(0, 2)),
           ],
         ),
         child: Column(
@@ -454,16 +482,23 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.withValues(alpha: 0.1),
+                    color: theme.colorScheme.primary.withAlpha(25),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: Colors.deepPurple, size: 18),
+                  child: Icon(icon, color: theme.colorScheme.primary, size: 18),
                 ),
                 const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey),
               ],
             ),
             const SizedBox(height: 12),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF311B92))),
+            Text(
+              title, 
+              style: TextStyle(
+                fontWeight: FontWeight.bold, 
+                fontSize: 13, 
+                color: isDark ? Colors.white : const Color(0xFF311B92)
+              )
+            ),
             const SizedBox(height: 4),
             Text(subtitle, style: const TextStyle(fontSize: 10, color: Colors.grey)),
           ],
