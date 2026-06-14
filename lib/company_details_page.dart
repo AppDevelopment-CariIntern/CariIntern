@@ -158,11 +158,14 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
 
     try {
       final companyRef = FirebaseFirestore.instance.collection('companies').doc(widget.name);
+      
+      // Use DateTime.now() instead of FieldValue.serverTimestamp() 
+      // because serverTimestamp is not supported inside arrayUnion.
       final newReview = {
         'user': _user.displayName ?? _user.email?.split('@')[0] ?? 'Anonymous',
         'rating': _userRating,
         'comment': _reviewController.text.trim(),
-        'timestamp': FieldValue.serverTimestamp(),
+        'timestamp': DateTime.now().toIso8601String(), 
         'isVerified': true, 
       };
 
@@ -172,11 +175,13 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
 
       _reviewController.clear();
       if (mounted) {
+        setState(() => _userRating = 5.0); // Reset rating
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Review submitted!'), backgroundColor: Colors.green),
         );
       }
     } catch (e) {
+      debugPrint("Review submission error: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error submitting review: $e'), backgroundColor: Colors.red),

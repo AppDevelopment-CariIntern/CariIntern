@@ -83,11 +83,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
         photoUrl = await storageRef.getDownloadURL();
       }
 
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      // Changed .update() to .set(..., SetOptions(merge: true)) to prevent failure if document doesn't exist
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'name': _nameController.text.trim(),
         'phone': _phoneController.text.trim(),
         'photoUrl': photoUrl,
-      });
+        'email': user.email, // Store email as well
+        'lastUpdated': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
 
       if (photoUrl != null) {
         await user.updatePhotoURL(photoUrl);
@@ -101,6 +104,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         );
       }
     } catch (e) {
+      debugPrint("Profile update error: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Update failed: $e'), backgroundColor: Colors.red),
