@@ -131,7 +131,7 @@ class CompanyService {
       'industry': 'Information Technology',
       'location': 'Cyberjaya, Selangor',
       'positions': ['Software Engineering Intern', 'IT Infrastructure Intern', 'Cloud Computing Intern', 'Technical Support Intern', 'Business Operations Intern'],
-      'description': 'Dell Technologies is a unique family of businesses that provides the essential infrastructure for organizations to build their digital future, transform IT, and protect their most important asset—information. Dell Malaysia serves as a global hub for technical support, financial services, and manufacturing operations.',
+      'description': 'Dell Technologies is a unique family of businesses that provides the address the essential infrastructure for organizations to build their digital future, transform IT, and protect their most important asset—information. Dell Malaysia serves as a global hub for technical support, financial services, and manufacturing operations.',
       'rating': '4.7',
       'imagePath': 'asset/image/dell-seeklogo.png',
       'bannerPath': 'asset/image/company/Dell technologies malaysia company.webp',
@@ -554,11 +554,17 @@ class CompanyService {
         
         final remoteCompany = remoteDocs[name];
         
+        // Update if document doesn't exist OR if local data (excluding reviews) has changed
         if (remoteCompany == null || !_isSame(localCompany, remoteCompany)) {
           debugPrint("[FIRESTORE] SYNC: Updating/Adding $name");
           final docRef = collection.doc(name);
+          
+          // PRESERVE REVIEWS: Merge remote reviews with sample ones
+          final List<dynamic> mergedReviews = List.from(remoteCompany?['reviews'] ?? localCompany['reviews']);
+          
           batch.set(docRef, {
             ...localCompany,
+            'reviews': mergedReviews,
             'lastUpdated': FieldValue.serverTimestamp(),
           });
           hasChanges = true;
@@ -584,6 +590,7 @@ class CompanyService {
     }
   }
 
+  // Simplified comparison: Ignores reviews so user reviews don't trigger constant syncs/overwrites
   bool _isSame(Map<String, dynamic> local, Map<String, dynamic> remote) {
     try {
       if (local['name'] != remote['name']) return false;
@@ -600,23 +607,6 @@ class CompanyService {
       if (localPos.length != remotePos.length) return false;
       for (int i = 0; i < localPos.length; i++) {
         if (localPos[i] != remotePos[i]) return false;
-      }
-      
-      final localReviews = local['reviews'] as List?;
-      final remoteReviews = remote['reviews'] as List?;
-      if ((localReviews?.length ?? 0) != (remoteReviews?.length ?? 0)) return false;
-
-      if (localReviews != null && remoteReviews != null) {
-        for (int i = 0; i < localReviews.length; i++) {
-          final l = localReviews[i] as Map;
-          final r = remoteReviews[i] as Map;
-          if (l['user'] != r['user'] || 
-              l['comment'] != r['comment'] || 
-              l['isVerified'] != r['isVerified'] || 
-              l['isSample'] != r['isSample']) {
-            return false;
-          }
-        }
       }
       
       return true;

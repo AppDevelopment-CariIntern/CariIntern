@@ -156,17 +156,28 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
       return;
     }
 
+    setState(() {}); // Show loading if needed
+
     try {
+      // Logic to check if user has an "Accepted" application for this company
+      final applicationsQuery = await FirebaseFirestore.instance
+          .collection('applications')
+          .where('userId', isEqualTo: _user.uid)
+          .where('companyName', isEqualTo: widget.name)
+          .where('status', isEqualTo: 'Accepted')
+          .limit(1)
+          .get();
+
+      bool isVerified = applicationsQuery.docs.isNotEmpty;
+
       final companyRef = FirebaseFirestore.instance.collection('companies').doc(widget.name);
       
-      // Use DateTime.now() instead of FieldValue.serverTimestamp() 
-      // because serverTimestamp is not supported inside arrayUnion.
       final newReview = {
         'user': _user.displayName ?? _user.email?.split('@')[0] ?? 'Anonymous',
         'rating': _userRating,
         'comment': _reviewController.text.trim(),
         'timestamp': DateTime.now().toIso8601String(), 
-        'isVerified': true, 
+        'isVerified': isVerified, 
       };
 
       await companyRef.update({
@@ -177,7 +188,10 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
       if (mounted) {
         setState(() => _userRating = 5.0); // Reset rating
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Review submitted!'), backgroundColor: Colors.green),
+          SnackBar(
+            content: Text(isVerified ? 'Verified review submitted!' : 'Review submitted (Unverified).'), 
+            backgroundColor: isVerified ? Colors.green : Colors.blueGrey
+          ),
         );
       }
     } catch (e) {
