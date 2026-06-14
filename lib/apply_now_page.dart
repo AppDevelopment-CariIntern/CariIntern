@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart'; // Required for links
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 
 class ApplyNowPage extends StatefulWidget {
   final String companyName;
@@ -25,6 +29,7 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
   
   bool _isUploading = false;
   String _cvFileName = "No file selected";
+  PlatformFile? _pickedFile;
 
   @override
   void initState() {
@@ -36,20 +41,77 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
     }
   }
 
+  Future<void> _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx'],
+      );
+
+      if (result != null) {
+        setState(() {
+          _pickedFile = result.files.first;
+          _cvFileName = _pickedFile!.name;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking file: $e')),
+      );
+    }
+  }
+
+  // This function uploads the file and returns the LINK (URL)
+  Future<String?> _uploadFileAndGetLink(String userId) async {
+    if (_pickedFile == null) return null;
+
+    try {
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}_${_pickedFile!.name}';
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('applications')
+          .child(userId)
+          .child(fileName);
+
+      UploadTask uploadTask;
+      if (kIsWeb) {
+        uploadTask = storageRef.putData(_pickedFile!.bytes!);
+      } else {
+        uploadTask = storageRef.putFile(File(_pickedFile!.path!));
+      }
+
+      final snapshot = await uploadTask;
+      // This is the LINK that goes to Firestore
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      debugPrint("Upload error: $e");
+      return null;
+    }
+  }
+
   Future<void> _handleSubmit() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error: User session expired. Please log in again.')),
-      );
-      return;
-    }
+    if (user == null) return;
 
     if (_formKey.currentState!.validate()) {
+      if (_pickedFile == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select your Resume/CV file')),
+        );
+        return;
+      }
+
       setState(() => _isUploading = true);
       
       try {
-        // Save application to Firestore
+        // 1. Upload to Storage and get the LINK
+        final cvUrlLink = await _uploadFileAndGetLink(user.uid);
+        
+        if (cvUrlLink == null) {
+          throw Exception("Failed to get download link. Make sure Storage is enabled.");
+        }
+
+        // 2. Save the LINK to Firestore
         await FirebaseFirestore.instance.collection('applications').add({
           'companyName': widget.companyName,
           'position': widget.position,
@@ -57,6 +119,8 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
           'email': _emailController.text.trim(),
           'phone': _phoneController.text.trim(),
           'portfolio': _portfolioController.text.trim(),
+          'cvUrl': cvUrlLink, // Storing the link here
+          'cvFileName': _pickedFile!.name,
           'status': 'Pending',
           'appliedAt': FieldValue.serverTimestamp(),
           'userId': user.uid,
@@ -64,34 +128,8 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
 
         if (!mounted) return;
         setState(() => _isUploading = false);
+        _showSuccessDialog();
         
-        final theme = Theme.of(context);
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            backgroundColor: theme.colorScheme.surface,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.green, size: 28),
-                const SizedBox(width: 12),
-                Text('Success!', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
-              ],
-            ),
-            content: Text('Your application for ${widget.position} at ${widget.companyName} has been submitted successfully.', 
-              style: TextStyle(fontSize: 16, color: theme.colorScheme.onSurface)),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close dialog
-                  Navigator.pop(context); // Go back to details page
-                },
-                child: Text('OK', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.primary, fontSize: 16)),
-              ),
-            ],
-          ),
-        );
       } catch (e) {
         setState(() => _isUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -101,23 +139,40 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
     }
   }
 
+  void _showSuccessDialog() {
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Success!'),
+        content: const Text('Your application and resume link have been submitted.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: const Text('Apply Now'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.primary),
+          icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Apply Now',
-          style: TextStyle(color: isDark ? Colors.white : const Color(0xFF311B92), fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -127,150 +182,79 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header Card
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: isDark 
-                        ? [theme.colorScheme.primary, theme.colorScheme.primary.withAlpha(180)]
-                        : [Colors.deepPurple, const Color(0xFF7C4DFF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    colors: [theme.colorScheme.primary, theme.colorScheme.primary.withOpacity(0.7)],
                   ),
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.primary.withAlpha(isDark ? 50 : 76),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
                 ),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      backgroundColor: Colors.white24,
-                      child: Icon(Icons.work_outline, color: Colors.white),
-                    ),
+                    const Icon(Icons.work_outline, color: Colors.white, size: 30),
                     const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.position,
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                          Text(
-                            widget.companyName,
-                            style: const TextStyle(fontSize: 14, color: Colors.white70),
-                          ),
-                        ],
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(widget.position, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                        Text(widget.companyName, style: const TextStyle(color: Colors.white70)),
+                      ],
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 32),
               
-              _buildLabel('Full Name'),
-              TextFormField(
-                controller: _nameController,
-                style: TextStyle(color: theme.colorScheme.onSurface),
-                decoration: _inputDecoration('Enter your full name', Icons.person_outline),
-                validator: (value) => value!.isEmpty ? 'Please enter your name' : null,
-              ),
+              _buildTextField(_nameController, 'Full Name', Icons.person_outline),
               const SizedBox(height: 20),
-              
-              _buildLabel('Email Address'),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: TextStyle(color: theme.colorScheme.onSurface),
-                decoration: _inputDecoration('Enter your email', Icons.email_outlined),
-                validator: (value) => value!.isEmpty ? 'Please enter your email' : null,
-              ),
+              _buildTextField(_emailController, 'Email', Icons.email_outlined),
               const SizedBox(height: 20),
-              
-              _buildLabel('Phone Number'),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                style: TextStyle(color: theme.colorScheme.onSurface),
-                decoration: _inputDecoration('Enter your phone number', Icons.phone_outlined),
-                validator: (value) => value!.isEmpty ? 'Please enter your phone number' : null,
-              ),
+              _buildTextField(_phoneController, 'Phone Number', Icons.phone_outlined),
               const SizedBox(height: 20),
-              
-              _buildLabel('Portfolio/LinkedIn URL (Optional)'),
-              TextFormField(
-                controller: _portfolioController,
-                style: TextStyle(color: theme.colorScheme.onSurface),
-                decoration: _inputDecoration('https://linkedin.com/in/yourprofile', Icons.link),
-              ),
+              _buildTextField(_portfolioController, 'Portfolio Link (Optional)', Icons.link),
               const SizedBox(height: 32),
-              
-              _buildLabel('Upload Resume/CV (PDF)'),
+
+              // File Selection UI
+              const Text('Upload Resume/CV (PDF)', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(isDark ? 0 : 13),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isDark ? theme.colorScheme.primary.withAlpha(51) : const Color(0xFFF3E5F5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(Icons.description_outlined, color: theme.colorScheme.primary),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        _cvFileName,
-                        style: TextStyle(color: isDark ? Colors.white70 : Colors.grey.shade600, fontWeight: FontWeight.w500),
-                      ),
-                    ),
+                    Icon(Icons.description, color: theme.colorScheme.primary),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(_cvFileName, overflow: TextOverflow.ellipsis)),
                     TextButton(
-                      onPressed: () {
-                        setState(() => _cvFileName = "resume_final.pdf");
-                      },
-                      style: TextButton.styleFrom(foregroundColor: theme.colorScheme.primary),
-                      child: const Text('Select File', style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: _pickFile,
+                      child: const Text('Select File'),
                     ),
                   ],
                 ),
               ),
-              
-              const SizedBox(height: 48),
+
+              const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
-                height: 60,
+                height: 55,
                 child: ElevatedButton(
                   onPressed: _isUploading ? null : _handleSubmit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: Colors.white,
-                    elevation: 6,
-                    shadowColor: theme.colorScheme.primary.withAlpha(102),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                   ),
                   child: _isUploading 
-                    ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Submit Application', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Submit Application', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
-              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -278,40 +262,15 @@ class _ApplyNowPageState extends State<ApplyNowPage> {
     );
   }
 
-  Widget _buildLabel(String label) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0, left: 4),
-      child: Text(
-        label,
-        style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF311B92), fontSize: 14),
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String hint, IconData icon) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha(120), fontSize: 14),
-      prefixIcon: Icon(icon, color: theme.colorScheme.primary, size: 22),
-      filled: true,
-      fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      validator: (value) => (label.contains('Optional') || (value != null && value.isNotEmpty)) ? null : 'Required',
     );
   }
 }
