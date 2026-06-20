@@ -67,6 +67,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
+    final phone = _phoneController.text.trim();
+    if (phone.isNotEmpty && (phone.length < 10 || phone.length > 11)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Wrong number! Phone number must be between 10 and 11 digits.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -86,7 +97,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       // Changed .update() to .set(..., SetOptions(merge: true)) to prevent failure if document doesn't exist
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'name': _nameController.text.trim(),
-        'phone': _phoneController.text.trim(),
+        'phone': phone,
         'photoUrl': photoUrl,
         'email': user.email, // Store email as well
         'lastUpdated': FieldValue.serverTimestamp(),
